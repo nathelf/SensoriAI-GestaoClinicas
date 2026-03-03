@@ -69,7 +69,6 @@ function RelatoriosDemo() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const posRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const rafIdRef = useRef<number | null>(null);
 
   const getPosInContainer = useCallback((el: HTMLElement | null) => {
     if (!el || !containerRef.current) return null;
@@ -92,9 +91,10 @@ function RelatoriosDemo() {
     const target = targetDotRef.current;
     const targetCenter = target ? getPosInContainer(target) : null;
 
-    const flushPos = () => {
-      rafIdRef.current = null;
-      setDragPos({ ...posRef.current });
+    const getXY = (clientX: number, clientY: number) => {
+      if (!containerRef.current) return null;
+      const r = containerRef.current.getBoundingClientRect();
+      return { x: clientX - r.left, y: clientY - r.top };
     };
 
     const onMove = (e: MouseEvent) => {
@@ -104,37 +104,25 @@ function RelatoriosDemo() {
         const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
         if (dist <= DROP_RADIUS_PX) {
           posRef.current = targetCenter;
-          if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
-          rafIdRef.current = null;
           setDragPos(targetCenter);
+          setConnected(true);
           return;
         }
       }
       posRef.current = xy;
-      if (rafIdRef.current === null) rafIdRef.current = requestAnimationFrame(flushPos);
+      setDragPos({ ...xy });
     };
-    const getXY = (clientX: number, clientY: number) => {
-      if (!containerRef.current) return null;
-      const r = containerRef.current.getBoundingClientRect();
-      return { x: clientX - r.left, y: clientY - r.top };
-    };
-    const onUp = (e: MouseEvent) => {
-      const xy = getXY(e.clientX, e.clientY);
-      if (xy && targetCenter) {
-        const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
-        if (dist <= DROP_RADIUS_PX) setConnected(true);
-      }
-      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
+
+    const onUp = () => {
       setIsDragging(false);
       setDragPos(null);
     };
+
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseup", onUp);
     return () => {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
-      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
     };
   }, [isDragging, getPosInContainer]);
 
