@@ -5,7 +5,7 @@ import { useCrud } from "@/hooks/useCrud";
 import { CrudModal, FormField, FormInput, FormTextarea, FormSelect } from "@/components/CrudModal";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
-interface Sale { id: string; patient_id: string | null; professional_id: string | null; payment_method_id: string | null; total: number; discount: number; status: string; notes: string | null; sale_date: string; }
+interface Sale { id: string; patient_id: string | null; professional_id: string | null; payment_method_id: string | null; total: number; discount?: number; status?: string; notes: string | null; sale_date: string; }
 interface Patient { id: string; name: string; }
 interface Professional { id: string; name: string; }
 interface PaymentMethod { id: string; name: string; }
@@ -24,11 +24,11 @@ export default function Vendas() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const openCreate = () => { setEditing(null); setForm(empty); setModalOpen(true); };
-  const openEdit = (s: Sale) => { setEditing(s); setForm({ patient_id: s.patient_id || "", professional_id: s.professional_id || "", payment_method_id: s.payment_method_id || "", total: String(s.total), discount: String(s.discount), status: s.status, notes: s.notes || "" }); setModalOpen(true); };
+  const openEdit = (s: Sale) => { setEditing(s); setForm({ patient_id: s.patient_id || "", professional_id: s.professional_id || "", payment_method_id: s.payment_method_id || "", total: String(s.total), discount: String(s.discount ?? 0), status: s.status ?? "finalizada", notes: s.notes || "" }); setModalOpen(true); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
-    const payload = { patient_id: form.patient_id || null, professional_id: form.professional_id || null, payment_method_id: form.payment_method_id || null, total: parseFloat(form.total), discount: parseFloat(form.discount), status: form.status, notes: form.notes || null };
+    const payload = { patient_id: form.patient_id || null, professional_id: form.professional_id || null, payment_method_id: form.payment_method_id || null, total: parseFloat(form.total), discount: parseFloat(form.discount) || 0, status: form.status || "finalizada", notes: form.notes || null };
     if (editing) await update(editing.id, payload as any); else await create(payload as any);
     setSaving(false); setModalOpen(false);
   };
@@ -50,12 +50,12 @@ export default function Vendas() {
             <div key={s.id} className="stat-card !p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-foreground">{patientName(s.patient_id)}</p>
-                <p className="text-xs text-muted-foreground">{new Date(s.sale_date).toLocaleDateString("pt-BR")} · {s.status}</p>
+                <p className="text-xs text-muted-foreground">{new Date(s.sale_date).toLocaleDateString("pt-BR")} · {s.status ?? "finalizada"}</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-right">
                   <p className="text-sm font-bold text-foreground">R$ {Number(s.total).toFixed(2)}</p>
-                  {Number(s.discount) > 0 && <p className="text-[10px] text-muted-foreground">Desc: R$ {Number(s.discount).toFixed(2)}</p>}
+                  {(Number(s.discount ?? 0) > 0) && <p className="text-[10px] text-muted-foreground">Desc: R$ {Number(s.discount).toFixed(2)}</p>}
                 </div>
                 <button onClick={() => openEdit(s)} className="p-2 rounded-lg hover:bg-muted"><Pencil className="w-3.5 h-3.5 text-muted-foreground" /></button>
                 <button onClick={() => setDeleteId(s.id)} className="p-2 rounded-lg hover:bg-destructive/20"><Trash2 className="w-3.5 h-3.5 text-destructive-foreground" /></button>

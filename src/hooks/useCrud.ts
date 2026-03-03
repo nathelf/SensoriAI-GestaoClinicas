@@ -18,9 +18,8 @@ export function useCrud<T extends { id: string }>({ table, orderBy = "created_at
   const fetch = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data: rows, error } = await (supabase.from(table as any) as any)
-      .select(select)
-      .order(orderBy, { ascending })
+    const q = supabase.from(table).select(select).order(orderBy, { ascending });
+    const { data: rows, error } = await q;
     if (error) { toast.error("Erro ao carregar dados"); console.error(error); }
     else setData((rows || []) as T[]);
     setLoading(false);
@@ -31,7 +30,7 @@ export function useCrud<T extends { id: string }>({ table, orderBy = "created_at
   const create = async (item: Partial<T>) => {
     if (!user) return null;
     const payload = { ...item, user_id: user.id } as any;
-    const { data: created, error } = await (supabase.from(table as any) as any).insert(payload).select().single();
+    const { data: created, error } = await supabase.from(table).insert(payload).select().single();
     if (error) { toast.error("Erro ao criar"); console.error(error); return null; }
     toast.success("Criado com sucesso!");
     await fetch();
@@ -39,7 +38,7 @@ export function useCrud<T extends { id: string }>({ table, orderBy = "created_at
   };
 
   const update = async (id: string, item: Partial<T>) => {
-    const { error } = await (supabase.from(table as any) as any).update(item).eq("id", id);
+    const { error } = await supabase.from(table).update(item).eq("id", id);
     if (error) { toast.error("Erro ao atualizar"); console.error(error); return false; }
     toast.success("Atualizado com sucesso!");
     await fetch();
@@ -47,7 +46,7 @@ export function useCrud<T extends { id: string }>({ table, orderBy = "created_at
   };
 
   const remove = async (id: string) => {
-    const { error } = await (supabase.from(table as any) as any).delete().eq("id", id);
+    const { error } = await supabase.from(table).delete().eq("id", id);
     if (error) { toast.error("Erro ao excluir"); console.error(error); return false; }
     toast.success("Excluído com sucesso!");
     await fetch();

@@ -2,70 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Send, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { streamAnnaChat } from "@/lib/annaChat";
+import { useChatIntegration } from "@/hooks/useChatIntegration";
+import type { ChatMessage } from "@/lib/annaChat";
 
-type Msg = { role: "user" | "assistant"; content: string };
-
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/anna-chat`;
-
-async function streamChat({
-  messages,
-  onDelta,
-  onDone,
-}: {
-  messages: Msg[];
-  onDelta: (text: string) => void;
-  onDone: () => void;
-}) {
-  const resp = await fetch(CHAT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-    body: JSON.stringify({ messages }),
-  });
-
-  if (resp.status === 429) {
-    toast.error("Muitas requisições. Aguarde alguns segundos.");
-    onDone();
-    return;
-  }
-  if (resp.status === 402) {
-    toast.error("Créditos de IA esgotados.");
-    onDone();
-    return;
-  }
-  if (!resp.ok || !resp.body) throw new Error("Failed to start stream");
-
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buf = "";
-  let done = false;
-
-  while (!done) {
-    const { done: rd, value } = await reader.read();
-    if (rd) break;
-    buf += decoder.decode(value, { stream: true });
-
-    let idx: number;
-    while ((idx = buf.indexOf("\n")) !== -1) {
-      let line = buf.slice(0, idx);
-      buf = buf.slice(idx + 1);
-      if (line.endsWith("\r")) line = line.slice(0, -1);
-      if (!line.startsWith("data: ")) continue;
-      const json = line.slice(6).trim();
-      if (json === "[DONE]") { done = true; break; }
-      try {
-        const parsed = JSON.parse(json);
-        const c = parsed.choices?.[0]?.delta?.content;
-        if (c) onDelta(c);
-      } catch { buf = line + "\n" + buf; break; }
-    }
-  }
-  onDone();
-}
+type Msg = ChatMessage;
 
 export function AnnaChat() {
   const [open, setOpen] = useState(false);
@@ -73,6 +15,11 @@ export function AnnaChat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { triggerChatOpened } = useChatIntegration();
+
+  useEffect(() => {
+    if (open) triggerChatOpened();
+  }, [open, triggerChatOpened]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,11 +45,13 @@ export function AnnaChat() {
     };
 
     try {
-      await streamChat({
+      const result = await streamAnnaChat({
         messages: [...messages, userMsg],
         onDelta: upsert,
         onDone: () => setLoading(false),
       });
+      if (result === "rate_limit") toast.error("Muitas requisições. Aguarde alguns segundos.");
+      else if (result === "credits") toast.error("Créditos de IA esgotados.");
     } catch (e) {
       console.error(e);
       setLoading(false);
@@ -114,7 +63,7 @@ export function AnnaChat() {
     <>
       {/* FAB */}
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen(prev => !prev)}
         className="fixed bottom-24 lg:bottom-6 right-20 lg:right-24 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-pastel-rose text-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
       >
         {open ? <X className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}

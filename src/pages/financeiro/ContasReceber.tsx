@@ -65,7 +65,7 @@ export default function ContasReceber() {
                   <tr key={item.id} className="border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="py-3 px-4 font-medium text-foreground">{item.description}</td>
                     <td className="py-3 px-4 text-success-foreground font-semibold">R$ {Number(item.amount).toFixed(2)}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{item.due_date}</td>
+                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{item.due_date ? new Date(item.due_date).toLocaleDateString("pt-BR") : "—"}</td>
                     <td className="py-3 px-4"><span className={`text-xs px-2 py-1 rounded-lg font-medium ${statusColors[s]}`}>{s}</span></td>
                     <td className="py-3 px-4">
                       <div className="flex gap-1">

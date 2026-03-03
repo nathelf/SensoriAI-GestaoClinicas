@@ -5,22 +5,30 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const OPENAI_API_BASE = Deno.env.get("OPENAI_API_BASE") || "https://api.openai.com";
+const CHAT_MODEL = Deno.env.get("CHAT_MODEL") || "gpt-4o-mini";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured. Set it in Supabase Edge Function secrets.");
+    }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const { messages } = await req.json();
+    const baseUrl = OPENAI_API_BASE.replace(/\/$/, "");
+    const url = `${baseUrl}/v1/chat/completions`;
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: CHAT_MODEL,
         messages: [
           {
             role: "system",
@@ -42,7 +50,7 @@ Suas capacidades:
 Regras:
 - Respostas curtas e objetivas (máximo 3 parágrafos)
 - Sempre ofereça próximos passos ao final
-- Se não souber, diga honestamente e sugira o canal de suporte`
+- Se não souber, diga honestamente e sugira o canal de suporte`,
           },
           ...messages,
         ],
