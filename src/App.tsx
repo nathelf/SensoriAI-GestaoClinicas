@@ -19,6 +19,7 @@ import AgendaBloqueios from "./pages/AgendaBloqueios";
 import AgendaLinks from "./pages/AgendaLinks";
 import Pacientes from "./pages/Pacientes";
 import CliniDocs from "./pages/CliniDocs";
+import DocumentoAssinatura from "./pages/DocumentoAssinatura";
 import Comunicacao from "./pages/Comunicacao";
 import Financeiro from "./pages/Financeiro";
 import Vendas from "./pages/Vendas";
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/agenda/links" element={<AgendaLinks />} />
               <Route path="/pacientes" element={<Pacientes />} />
               <Route path="/clinidocs" element={<CliniDocs />} />
+              <Route path="/documentos/assinatura/:id" element={<DocumentoAssinatura />} />
               <Route path="/comunicacao" element={<Comunicacao />} />
               <Route path="/pacientes/comunicacao" element={<PacientesComunicacao />} />
               {/* Financeiro */}
