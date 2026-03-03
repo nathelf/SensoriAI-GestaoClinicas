@@ -71,10 +71,15 @@ export default function Auth() {
     setLoading(true);
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const timeoutMs = 15000;
+        const signInPromise = supabase.auth.signInWithPassword({ email, password });
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Tempo esgotado. Verifique sua conexão e se a URL do Supabase está correta (VITE_SUPABASE_URL).")), timeoutMs)
+        );
+        const { data, error } = await Promise.race([signInPromise, timeoutPromise]);
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
-        if (data.session) {
+        if (data?.session) {
           await new Promise((r) => setTimeout(r, 150));
         }
         navigate("/dashboard", { replace: true });
@@ -90,8 +95,9 @@ export default function Auth() {
         if (error) throw error;
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Erro na autenticação");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Erro na autenticação";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -294,15 +300,24 @@ export default function Auth() {
               disabled={loading}
               onClick={async () => {
                 setLoading(true);
-                const { error } = await supabase.auth.signInWithOAuth({
-                  provider: "google",
-                  options: {
-                    redirectTo: `${window.location.origin}/dashboard`,
-                    queryParams: { access_type: "offline", prompt: "consent" },
-                  },
-                });
-                if (error) {
-                  toast.error(error.message || "Erro ao entrar com Google");
+                try {
+                  const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                      redirectTo: `${window.location.origin}/dashboard`,
+                      queryParams: { access_type: "offline", prompt: "consent" },
+                    },
+                  });
+                  if (error) {
+                    toast.error(error.message || "Erro ao entrar com Google");
+                    return;
+                  }
+                  if (data?.url) {
+                    window.location.href = data.url;
+                    return;
+                  }
+                  toast.error("Resposta inesperada do servidor. Tente novamente.");
+                } finally {
                   setLoading(false);
                 }
               }}
