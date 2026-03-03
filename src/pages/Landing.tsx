@@ -58,7 +58,7 @@ const systemModules: { icon: LucideIcon; title: string; tagline: string; items: 
 ];
 
 /** Demonstração interativa: arrastar do ponto roxo do bloco de cima até o de baixo para “conectar” */
-const DROP_RADIUS_PX = 56;
+const DROP_RADIUS_PX = 64;
 
 function RelatoriosDemo() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -96,13 +96,16 @@ function RelatoriosDemo() {
       setDragPos({ ...posRef.current });
     };
 
-    const onMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
+    const getXY = (clientX: number, clientY: number) => {
+      if (!containerRef.current) return null;
       const r = containerRef.current.getBoundingClientRect();
-      const mx = e.clientX - r.left;
-      const my = e.clientY - r.top;
+      return { x: clientX - r.left, y: clientY - r.top };
+    };
+    const onMove = (e: MouseEvent) => {
+      const xy = getXY(e.clientX, e.clientY);
+      if (!xy) return;
       if (targetCenter) {
-        const dist = Math.hypot(mx - targetCenter.x, my - targetCenter.y);
+        const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
         if (dist <= DROP_RADIUS_PX) {
           posRef.current = targetCenter;
           if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
@@ -111,16 +114,32 @@ function RelatoriosDemo() {
           return;
         }
       }
-      posRef.current = { x: mx, y: my };
+      posRef.current = xy;
       if (rafIdRef.current === null) rafIdRef.current = requestAnimationFrame(flushPos);
     };
-    const onUp = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const r = containerRef.current.getBoundingClientRect();
-      const mx = e.clientX - r.left;
-      const my = e.clientY - r.top;
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const t = e.touches[0];
+      const xy = getXY(t.clientX, t.clientY);
+      if (!xy) return;
       if (targetCenter) {
-        const dist = Math.hypot(mx - targetCenter.x, my - targetCenter.y);
+        const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
+        if (dist <= DROP_RADIUS_PX) {
+          posRef.current = targetCenter;
+          if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = null;
+          setDragPos(targetCenter);
+          return;
+        }
+      }
+      posRef.current = xy;
+      if (rafIdRef.current === null) rafIdRef.current = requestAnimationFrame(flushPos);
+    };
+    const onUp = (clientX: number, clientY: number) => {
+      if (!containerRef.current) return;
+      const xy = getXY(clientX, clientY);
+      if (xy && targetCenter) {
+        const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
         if (dist <= DROP_RADIUS_PX) setConnected(true);
       }
       if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
@@ -128,11 +147,21 @@ function RelatoriosDemo() {
       setIsDragging(false);
       setDragPos(null);
     };
+    const onMouseUp = (e: MouseEvent) => onUp(e.clientX, e.clientY);
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.changedTouches.length > 0) onUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    };
     window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mouseup", onUp);
+    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
     return () => {
       window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
       if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
     };
   }, [isDragging, getPosInContainer]);
@@ -144,7 +173,7 @@ function RelatoriosDemo() {
   const canDraw = showLine && lineStart && lineEnd;
 
   return (
-    <div ref={containerRef} className="lg:col-span-3 relative h-[450px] rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto">
+    <div ref={containerRef} className="lg:col-span-3 relative h-[320px] sm:h-[380px] lg:h-[450px] rounded-xl sm:rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px]" />
       {!connected && !isDragging && (
         <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20">Arraste do ponto roxo até o outro bloco para conectar</p>
@@ -177,8 +206,9 @@ function RelatoriosDemo() {
           role="button"
           tabIndex={0}
           onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
+          onTouchStart={(e) => { e.preventDefault(); startDrag(); }}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
-          className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
+          className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto touch-manipulation min-w-[44px] min-h-[44px] -m-5 flex items-center justify-center"
           aria-label="Arraste até o bloco Resumo com IA para conectar"
         />
       </div>
@@ -213,6 +243,15 @@ export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [assistantChoice, setAssistantChoice] = useState<AssistantChoice>(null);
+  const [isTouch, setIsTouch] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    setIsTouch(mq.matches);
+    const fn = () => setIsTouch(mq.matches);
+    mq.addEventListener("change", fn);
+    return () => mq.removeEventListener("change", fn);
+  }, []);
 
   /** Posição do mouse para a rede de partículas (repulsão) - atualizada globalmente */
   const mousePosRef = useRef<{ x: number; y: number } | null>(null);
@@ -249,13 +288,18 @@ export default function Landing() {
 
   if (loading) return null;
 
+  const showCustomCursor = !isTouch && cursorVisible;
+
   return (
     <div
-      className="min-h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/20 cursor-none"
+      className={cn(
+        "min-h-screen bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20",
+        !isTouch && "cursor-none"
+      )}
       onMouseEnter={() => setCursorVisible(true)}
       onMouseLeave={() => setCursorVisible(false)}
     >
-      <LandingCursor visible={cursorVisible} />
+      <LandingCursor visible={showCustomCursor} />
 
       {/* --- Hero background: grid + rede de partículas + orb --- */}
       <div
@@ -263,8 +307,9 @@ export default function Landing() {
         aria-hidden
       >
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.06)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.06)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,hsl(var(--primary)/0.08)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.08)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black_40%,transparent_100%)]" />
-        <HeroParticleNetwork mousePosRef={mousePosRef} />
-        {/* Orb suave que segue o cursor - discreto em ambos os temas */}
+        {!isTouch && <HeroParticleNetwork mousePosRef={mousePosRef} />}
+        {/* Orb suave que segue o cursor - apenas desktop (evita animação pesada no mobile) */}
+        {!isTouch && (
         <motion.div
           className="pointer-events-none absolute left-1/2 top-1/2 w-[70vmin] h-[70vmin] rounded-full -translate-x-1/2 -translate-y-1/2 opacity-20 dark:opacity-25"
           style={{
@@ -274,6 +319,7 @@ export default function Landing() {
             filter: "blur(50px)",
           }}
         />
+        )}
         <div className="absolute top-[-10%] left-[-10%] w-[35vw] h-[35vw] rounded-full bg-primary/5 dark:bg-primary/10 blur-[100px] animate-pulse" />
         <div className="absolute top-[25%] right-[-5%] w-[30vw] h-[30vw] rounded-full bg-purple-500/5 dark:bg-purple-500/10 blur-[100px] animate-pulse" style={{ animationDuration: "4s", animationDirection: "reverse" }} />
       </div>
@@ -293,10 +339,10 @@ export default function Landing() {
 
       {/* --- Header --- */}
       <header className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-500 border-b",
-        scrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-sm py-3" : "bg-transparent border-transparent py-5"
+        "fixed top-0 w-full z-50 transition-all duration-500 border-b safe-top",
+        scrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-sm py-2 sm:py-3" : "bg-transparent border-transparent py-3 sm:py-5"
       )}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-2.5 group">
             <SensoriAILogo variant="full" iconClassName="w-10 h-10" className="group-hover:opacity-90 transition-opacity" />
           </Link>
@@ -307,10 +353,10 @@ export default function Landing() {
             <a href="#relatorios" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Relatórios em Blocos</a>
             <a href="#suporte" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Suporte</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link to="/auth"><Button variant="ghost" className="hidden sm:inline-flex font-medium">Entrar</Button></Link>
-            <Link to="/auth">
-              <Button className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 gap-2 px-6 relative overflow-hidden group">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link to="/auth" className="hidden sm:inline-flex"><Button variant="ghost" className="font-medium touch-target">Entrar</Button></Link>
+            <Link to="/auth" className="min-h-[44px] flex items-center">
+              <Button className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] sm:hover:-translate-y-0.5 transition-all duration-300 gap-2 px-4 sm:px-6 h-11 sm:h-auto min-h-[44px] relative overflow-hidden group text-sm sm:text-base">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                 Teste Grátis <ArrowRight className="w-4 h-4" />
               </Button>
@@ -319,10 +365,10 @@ export default function Landing() {
         </div>
       </header>
 
-      <main className="relative z-10 pt-24 sm:pt-32">
-        {/* --- Hero Section (Dark Mode Premium): orb segue o mouse nesta área --- */}
+      <main className="relative z-10 pt-20 sm:pt-24 lg:pt-32 pb-8">
+        {/* --- Hero Section --- */}
         <section
-          className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-visible"
+          className="relative min-h-[85vh] sm:min-h-[90vh] flex flex-col items-center justify-center px-3 sm:px-6 lg:px-8 overflow-visible"
           onMouseMove={handleMouseMove}
         >
           
@@ -356,9 +402,9 @@ export default function Landing() {
             </motion.div>
           </div>
 
-          <div className="max-w-5xl mx-auto text-center relative z-10 mt-10">
-            {/* Banner: Plataforma ativa • +2.400 clínicas confiam */}
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, type: "spring" }} className="inline-flex items-center gap-2.5 rounded-full bg-foreground/10 dark:bg-foreground/5 border border-border/50 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-foreground mb-8 shadow-sm cursor-default">
+          <div className="max-w-5xl mx-auto text-center relative z-10 mt-6 sm:mt-10 px-1">
+            {/* Banner */}
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, type: "spring" }} className="inline-flex items-center gap-2 rounded-full bg-foreground/10 dark:bg-foreground/5 border border-border/50 backdrop-blur-md px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-foreground mb-5 sm:mb-8 shadow-sm cursor-default">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-80" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -366,8 +412,8 @@ export default function Landing() {
               Plataforma personalizada para o seu fluxo de trabalho
             </motion.div>
             
-            {/* Título: "Sua clínica." / "Suas regras." (gradiente) / "Seu futuro." */}
-            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
+            {/* Título principal */}
+            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
               <motion.span variants={fadeUp} className="block">Sua clínica.</motion.span>
               <motion.span
                 variants={fadeUp}
@@ -378,21 +424,21 @@ export default function Landing() {
               <motion.span variants={fadeUp} className="block mt-2">Seu futuro.</motion.span>
             </motion.h1>
             
-            <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+            <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-5 sm:mt-8 text-base sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed px-1">
               Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">Arraste blocos, conecte dados</strong> e crie uma plataforma gerencial desenhada para o seu fluxo com IA nativa. <strong className="font-semibold text-foreground">Modelo customizado</strong> para o que sua clínica precisa.
             </motion.p>
             
-            <motion.div {...fadeUp} transition={{ delay: 0.3, duration: 0.8 }} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/auth" className="w-full sm:w-auto relative group inline-flex order-2 sm:order-1">
+            <motion.div {...fadeUp} transition={{ delay: 0.3, duration: 0.8 }} className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
+              <Link to="/auth" className="w-full sm:w-auto relative group inline-flex order-2 sm:order-1 min-h-[48px]">
                 <motion.span
                   whileTap={{ scale: 0.98 }}
-                  className="relative w-full sm:w-auto h-14 px-8 text-base rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors gap-2.5 font-semibold flex items-center justify-center cursor-pointer shadow-lg shadow-primary/25"
+                  className="relative w-full sm:w-auto min-h-[48px] h-14 px-6 sm:px-8 text-base rounded-full bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 transition-colors gap-2.5 font-semibold flex items-center justify-center cursor-pointer shadow-lg shadow-primary/25 touch-target"
                 >
                   <Rocket className="w-4 h-4" /> Iniciar gratuitamente
                 </motion.span>
               </Link>
-              <a href="#relatorios" className="w-full sm:w-auto order-1 sm:order-2">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-8 rounded-full border-foreground/30 bg-foreground/5 hover:bg-foreground/10 text-foreground gap-2.5 font-semibold">
+              <a href="#relatorios" className="w-full sm:w-auto order-1 sm:order-2 min-h-[48px] flex">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto min-h-[48px] h-14 px-6 sm:px-8 rounded-full border-foreground/30 bg-foreground/5 hover:bg-foreground/10 active:bg-foreground/15 text-foreground gap-2.5 font-semibold touch-target">
                   Ver demonstração <ChevronDown className="w-4 h-4" />
                 </Button>
               </a>
@@ -429,26 +475,26 @@ export default function Landing() {
         </section>
 
         {/* --- Destaque: Relatórios Drag & Drop --- */}
-        <section id="relatorios" className="py-32 relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
-              <p className="mt-4 text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
+        <section id="relatorios" className="py-16 sm:py-24 lg:py-32 relative">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
+              <p className="mt-3 sm:mt-4 text-base sm:text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
             </div>
 
             <motion.div 
-              initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
-              className="relative rounded-[2rem] overflow-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-8 lg:p-12 shadow-2xl"
+              initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8 }}
+              className="relative rounded-xl sm:rounded-[2rem] overflow-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-4 sm:p-8 lg:p-12 shadow-2xl"
             >
-              <div className="grid lg:grid-cols-5 gap-12 items-center relative z-10">
-                <div className="lg:col-span-2 space-y-8">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
-                    <Workflow className="w-7 h-7" />
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-12 items-center relative z-10">
+                <div className="lg:col-span-2 space-y-5 sm:space-y-8 order-2 lg:order-1">
+                  <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
+                    <Workflow className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <h3 className="text-3xl font-bold text-foreground leading-tight">
+                  <h3 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
                     Conecte blocos e deixe a IA gerar o relatório.
                   </h3>
-                  <p className="text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
                   <ul className="space-y-5">
                     {[
                       "Vincule Histórico do Paciente à nossa IA para enriquecer relatórios.",
@@ -465,20 +511,22 @@ export default function Landing() {
                   </ul>
                 </div>
                 
-                <RelatoriosDemo />
+                <div className="order-1 lg:order-2 min-h-[280px] sm:min-h-0">
+                  <RelatoriosDemo />
+                </div>
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* --- Recursos / O que sua clínica ganha --- */}
-        <section id="plataforma" className="py-24 bg-background">
+        <section id="plataforma" className="py-16 sm:py-24 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-14 max-w-2xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+            <div className="text-center mb-10 sm:mb-14 max-w-2xl mx-auto px-2">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
                 O que sua clínica ganha na prática
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground">
                 Cada módulo resolve um pedaço do seu dia — da agenda ao caixa, do prontuário ao estoque. A IA não fica num cantinho: ela entra no meio do processo.
               </p>
             </div>
@@ -519,9 +567,9 @@ export default function Landing() {
         </section>
 
         {/* --- SEÇÃO SUPORTE (Focado em IA Humanizada) --- */}
-        <section id="suporte" className="py-32 bg-primary/5 border-y border-border/50 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <section id="suporte" className="py-16 sm:py-24 lg:py-32 bg-primary/5 border-y border-border/50 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div>
                 <motion.div initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", bounce: 0.5 }} className="inline-flex w-16 h-16 rounded-full bg-white dark:bg-card shadow-md items-center justify-center mb-8 p-2">
                   <SensoriAILogo variant="icon" iconClassName="w-10 h-10" noTextFallback />
@@ -612,14 +660,14 @@ export default function Landing() {
                           <button
                             type="button"
                             onClick={() => setAssistantChoice("saved")}
-                            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium cursor-pointer hover:bg-primary/90 active:scale-[0.98] transition-all"
+                            className="min-h-[44px] px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium cursor-pointer hover:bg-primary/90 active:scale-[0.98] transition-all touch-target"
                           >
                             Sim, salvar
                           </button>
                           <button
                             type="button"
                             onClick={() => setAssistantChoice("declined")}
-                            className="px-3 py-1.5 bg-muted text-muted-foreground rounded-lg text-xs font-medium cursor-pointer hover:bg-muted/80 active:scale-[0.98] transition-all"
+                            className="min-h-[44px] px-4 py-2.5 bg-muted text-muted-foreground rounded-lg text-sm font-medium cursor-pointer hover:bg-muted/80 active:scale-[0.98] transition-all touch-target"
                           >
                             Não, obrigado
                           </button>
@@ -642,13 +690,13 @@ export default function Landing() {
         </section>
 
         {/* --- CTA Final --- */}
-        <section className="py-32 relative text-center px-4">
-          <h2 className="text-5xl font-black text-foreground mb-6">Pronto para a evolução?</h2>
-          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+        <section className="py-16 sm:py-24 lg:py-32 relative text-center px-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-4 sm:mb-6">Pronto para a evolução?</h2>
+          <p className="text-base sm:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto">
             Junte-se às clínicas que estão automatizando processos e focando no que importa: o paciente.
           </p>
-          <Link to="/auth">
-            <Button size="lg" className="h-16 px-12 text-lg rounded-full shadow-2xl shadow-primary/40 hover:scale-105 hover:shadow-primary/60 transition-all duration-300 gap-3">
+          <Link to="/auth" className="inline-flex min-h-[48px]">
+            <Button size="lg" className="min-h-[48px] h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg rounded-full shadow-2xl shadow-primary/40 active:scale-[0.98] sm:hover:scale-105 sm:hover:shadow-primary/60 transition-all duration-300 gap-3 touch-target">
               Criar conta gratuita agora <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>
