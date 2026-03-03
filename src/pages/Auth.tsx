@@ -71,9 +71,12 @@ export default function Auth() {
     setLoading(true);
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
+        if (data.session) {
+          await new Promise((r) => setTimeout(r, 150));
+        }
         navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
