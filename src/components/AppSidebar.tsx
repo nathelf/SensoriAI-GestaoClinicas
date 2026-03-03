@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -31,7 +31,6 @@ const navSections: NavSection[] = [
     basePath: "/atendimento",
     items: [
       { label: "Novo Atendimento", path: "/novo-atendimento" },
-      { label: "Documentos e Termos", path: "/clinidocs" },
       { label: "Histórico Clínico", path: "/historico" },
       { label: "Galeria de Evolução", path: "/galeria" },
     ],
@@ -164,6 +163,13 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
     return active?.title ?? "Dashboard";
   });
 
+  useEffect(() => {
+    const active = sections.find((s) =>
+      s.items.some((i) => i.path === location.pathname)
+    );
+    if (active) setExpanded(active.title);
+  }, [location.pathname]);
+
   const toggleSection = (title: string) => {
     setExpanded((prev) => (prev === title ? null : title));
   };
@@ -212,8 +218,11 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
 
             return (
               <div key={section.title}>
-                <button
+                <motion.button
+                  type="button"
                   onClick={() => toggleSection(section.title)}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                     ${sectionActive ? "bg-pastel-lavender text-primary" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
                 >
@@ -224,7 +233,7 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                   />
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {isExpanded && (
@@ -235,22 +244,43 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="ml-7 mt-0.5 space-y-0.5 border-l-2 border-border/40 pl-3 py-1">
-                        {section.items.map((item) => (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            onClick={onClose}
-                            className={`block px-3 py-2 rounded-xl text-sm transition-all duration-200
-                              ${isActive(item.path)
-                                ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                                : "text-muted-foreground hover:bg-pastel-lavender/60 hover:text-foreground"
-                              }`}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
+                      <motion.div
+                        initial="closed"
+                        animate="open"
+                        variants={{
+                          open: { transition: { staggerChildren: 0.03, delayChildren: 0.02 } },
+                          closed: {},
+                        }}
+                        className="ml-7 mt-0.5 space-y-0.5 border-l-2 border-border/40 pl-3 py-1"
+                      >
+                        {section.items.map((item) => {
+                          const active = isActive(item.path);
+                          return (
+                            <motion.div
+                              key={item.path}
+                              variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: -8 } }}
+                              className="relative"
+                            >
+                              {active && (
+                                <motion.div
+                                  layoutId="sidebarActiveIndicator"
+                                  className="absolute inset-0 rounded-xl bg-[#9b87f5] text-white"
+                                  style={{ zIndex: 0 }}
+                                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
+                              )}
+                              <Link
+                                to={item.path}
+                                onClick={onClose}
+                                className={`relative z-10 flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-colors
+                                  ${active ? "text-white shadow-sm" : "text-muted-foreground hover:bg-[#9b87f5]/10 hover:text-foreground"}`}
+                              >
+                                {item.label}
+                              </Link>
+                            </motion.div>
+                          );
+                        })}
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>

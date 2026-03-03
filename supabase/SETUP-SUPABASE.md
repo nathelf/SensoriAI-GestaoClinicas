@@ -91,6 +91,20 @@ Se aparecer **erro de CORS** ao gerar com IA no navegador, confira se a Edge Fun
 
 ---
 
+## 5. Conversor de Documentos (Backend Python – opcional)
+
+Para **conversão PDF ↔ Word** com alta fidelidade (tabelas, formatação), use o microserviço em Python:
+
+1. Entre na pasta **backend**: `cd backend`
+2. Crie e ative o ambiente virtual: `python -m venv venv` e depois `.\venv\Scripts\activate` (Windows) ou `source venv/bin/activate` (Mac/Linux)
+3. Instale as dependências: `pip install -r requirements.txt`
+4. Inicie o serviço: `uvicorn main:app --reload --port 8000`
+5. No **.env** do frontend, adicione: `VITE_DOCUMENT_API_URL=http://localhost:8000`
+
+Detalhes e requisitos (ex.: LibreOffice para Word→PDF no Linux) estão em **backend/README.md**.
+
+---
+
 ## 5. Testar
 
 1. Rode o app: `npm run dev`  

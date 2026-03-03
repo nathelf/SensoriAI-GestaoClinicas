@@ -397,14 +397,17 @@ export default function CliniDocs() {
               <span className="text-xs text-muted-foreground">
                 Edite o texto abaixo. Placeholders: {`{{nome_paciente}}, {{data}}, {{cpf}}, {{procedimento}}`}
               </span>
-              <button
+              <motion.button
                 type="button"
                 onClick={generateWithAI}
                 disabled={generating}
-                className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[#9b87f5]/15 text-[#9b87f5] text-xs font-medium flex items-center gap-1 disabled:opacity-50"
+                whileTap={{ scale: 0.98 }}
+                animate={generating ? { boxShadow: ["0 0 0 0 rgba(155,135,245,0.3)", "0 0 16px 2px rgba(155,135,245,0.5)", "0 0 0 0 rgba(155,135,245,0.3)"] } : {}}
+                transition={{ duration: 1.2, repeat: generating ? Infinity : 0 }}
+                className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[#9b87f5]/15 text-[#9b87f5] text-xs font-medium flex items-center gap-1 disabled:opacity-50 hover:shadow-[0_0_12px_rgba(155,135,245,0.25)]"
               >
                 <Sparkles className="w-3.5 h-3.5" /> {generating ? "Gerando..." : "Gerar com IA"}
-              </button>
+              </motion.button>
             </div>
             <EditorWysiwyg
               value={form.content}
