@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { BottomTabBar } from "./BottomTabBar";
@@ -6,20 +6,10 @@ import { AnnaChat } from "./AnnaChat";
 import { Menu, MessageCircle, LogOut, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-function isEmailConfirmed(user: { email_confirmed_at?: string | null }): boolean {
-  return Boolean(user?.email_confirmed_at);
-}
-
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { user, profile, userRole, loading, signOut } = useAuth();
-
-  useEffect(() => {
-    if (user && !isEmailConfirmed(user)) {
-      signOut();
-    }
-  }, [user, signOut]);
 
   if (loading) {
     return (
@@ -30,17 +20,6 @@ export function AppLayout() {
   }
 
   if (!user) return <Navigate to="/" replace />;
-
-  if (!isEmailConfirmed(user)) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          <p className="mb-2">E-mail não confirmado. Redirecionando...</p>
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </div>
-    );
-  }
 
   const initials = profile?.display_name
     ? profile.display_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
