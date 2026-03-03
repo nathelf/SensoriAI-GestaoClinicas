@@ -1,0 +1,54 @@
+import { ReactNode } from "react";
+import { X } from "lucide-react";
+
+interface CrudModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  onSubmit: (e: React.FormEvent) => void;
+  loading?: boolean;
+  submitLabel?: string;
+}
+
+export function CrudModal({ open, onClose, title, children, onSubmit, loading, submitLabel = "Salvar" }: CrudModalProps) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto border border-border/40" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-border/30">
+          <h2 className="text-lg font-bold text-foreground">{title}</h2>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
+        </div>
+        <form onSubmit={onSubmit} className="p-4 space-y-3">
+          {children}
+          <div className="flex gap-2 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border/40 text-sm font-medium text-muted-foreground hover:bg-muted">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">{loading ? "Salvando..." : submitLabel}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export function FormField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="text-xs font-medium text-muted-foreground mb-1 block">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+export function FormInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return <input {...props} className={`w-full px-3 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none ${props.className || ""}`} />;
+}
+
+export function FormTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea {...props} className={`w-full px-3 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none resize-none ${props.className || ""}`} rows={3} />;
+}
+
+export function FormSelect({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: ReactNode }) {
+  return <select {...props} className={`w-full px-3 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none ${props.className || ""}`}>{children}</select>;
+}

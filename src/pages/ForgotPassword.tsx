@@ -1,0 +1,65 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Brain, Mail, ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      setSent(true);
+      toast.success("E-mail de recuperação enviado!");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-primary mx-auto flex items-center justify-center mb-4">
+            <Brain className="w-8 h-8 text-primary-foreground" />
+          </div>
+          <h1 className="text-xl font-bold text-foreground">Recuperar senha</h1>
+        </div>
+        <div className="stat-card !p-6">
+          {sent ? (
+            <div className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">Enviamos um link de recuperação para <strong>{email}</strong>. Verifique sua caixa de entrada.</p>
+              <button onClick={() => navigate("/auth")} className="text-sm text-primary hover:underline">Voltar ao login</button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">E-mail</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" required className="w-full pl-10 pr-4 py-3 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 outline-none" />
+                </div>
+              </div>
+              <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm disabled:opacity-50">
+                {loading ? "Enviando..." : "Enviar link de recuperação"}
+              </button>
+              <button type="button" onClick={() => navigate("/auth")} className="w-full flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-3 h-3" /> Voltar ao login
+              </button>
+            </form>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}

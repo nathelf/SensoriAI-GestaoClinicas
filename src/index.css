@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@layer base {
+  :root {
+    --background: 220 14% 97%;
+    --foreground: 220 20% 22%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 22%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 22%;
+
+    --primary: 262 52% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 190 30% 80%;
+    --secondary-foreground: 220 20% 22%;
+
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 35 55% 90%;
+    --accent-foreground: 30 40% 30%;
+
+    --destructive: 0 70% 94%;
+    --destructive-foreground: 0 60% 45%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262 52% 65%;
+
+    --radius: 1.5rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 15% 40%;
+    --sidebar-primary: 262 52% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 262 40% 96%;
+    --sidebar-accent-foreground: 262 40% 35%;
+    --sidebar-border: 220 13% 93%;
+    --sidebar-ring: 262 52% 65%;
+
+    /* Custom tokens */
+    --pastel-purple: 262 52% 65%;
+    --pastel-lavender: 262 40% 92%;
+    --pastel-blue: 210 60% 85%;
+    --pastel-mint: 165 40% 82%;
+    --pastel-beige: 35 55% 90%;
+    --pastel-rose: 340 60% 90%;
+    --pastel-ice: 220 14% 97%;
+    --pastel-peach: 20 70% 88%;
+
+    --success: 155 50% 65%;
+    --success-foreground: 155 55% 25%;
+    --warning: 40 65% 75%;
+    --warning-foreground: 35 55% 28%;
+    --info: 210 50% 75%;
+    --info-foreground: 210 45% 25%;
+
+    --chart-income: 155 45% 70%;
+    --chart-expense: 0 65% 80%;
+    --chart-balance: 262 40% 70%;
+    --chart-predicted: 262 30% 85%;
+
+    /* Story/gradient tokens */
+    --gradient-story-start: 40 80% 88%;
+    --gradient-story-mid: 340 65% 85%;
+    --gradient-story-end: 262 55% 85%;
+  }
+
+  .dark {
+    --background: 220 25% 10%;
+    --foreground: 220 15% 92%;
+    --card: 220 22% 14%;
+    --card-foreground: 220 15% 92%;
+    --popover: 220 22% 14%;
+    --popover-foreground: 220 15% 92%;
+    --primary: 262 55% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 190 25% 25%;
+    --secondary-foreground: 220 15% 92%;
+    --muted: 220 22% 18%;
+    --muted-foreground: 220 12% 60%;
+    --accent: 35 30% 25%;
+    --accent-foreground: 35 50% 85%;
+    --destructive: 0 50% 25%;
+    --destructive-foreground: 0 60% 85%;
+    --border: 220 22% 20%;
+    --input: 220 22% 20%;
+    --ring: 262 55% 55%;
+    --sidebar-background: 220 25% 12%;
+    --sidebar-foreground: 220 12% 75%;
+    --sidebar-primary: 262 55% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 22% 18%;
+    --sidebar-accent-foreground: 220 12% 85%;
+    --sidebar-border: 220 22% 18%;
+    --sidebar-ring: 262 55% 55%;
+    --pastel-purple: 262 55% 55%;
+    --pastel-lavender: 262 35% 25%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 shadow-sm;
+  }
+  
+  .pastel-gradient {
+    background: linear-gradient(135deg, hsl(var(--pastel-lavender) / 0.3), hsl(var(--pastel-mint) / 0.2));
+  }
+
+  .story-gradient {
+    background: linear-gradient(135deg, hsl(var(--gradient-story-start)), hsl(var(--gradient-story-mid)), hsl(var(--gradient-story-end)));
+  }
+
+  .stat-card {
+    @apply bg-card rounded-3xl p-5 shadow-sm border border-border/40 transition-all duration-300 hover:shadow-md;
+  }
+
+  .menu-item-active {
+    @apply bg-primary text-primary-foreground rounded-xl font-medium;
+  }
+
+  .bottom-safe-area {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+}
