@@ -199,19 +199,8 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
           ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="flex items-center justify-between px-5 py-5 border-b border-border/30">
-<<<<<<< HEAD
-          <Link to="/" className="flex items-center gap-2.5" onClick={onClose}>
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Brain className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <span className="font-bold text-base text-foreground tracking-tight">Sensori</span>
-              <span className="font-bold text-base text-primary tracking-tight">AI</span>
-            </div>
-=======
           <Link to="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
             <SensoriAILogo variant="full" iconClassName="w-9 h-9" />
->>>>>>> 4c4f42b (landingpage tela de login atualizadas)
           </Link>
           <button onClick={onClose} className="lg:hidden p-1 rounded-lg hover:bg-muted">
             <X className="w-5 h-5 text-muted-foreground" />
