@@ -57,10 +57,8 @@ Regras:
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: system }] },
-          ...toGeminiContents(messages),
-        ],
+        systemInstruction: { parts: [{ text: system }] },
+        contents: toGeminiContents(messages),
         generationConfig: {
           temperature: 0.6,
           maxOutputTokens: 600,
