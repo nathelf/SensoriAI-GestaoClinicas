@@ -9,13 +9,15 @@ interface CrudModalProps {
   onSubmit: (e: React.FormEvent) => void;
   loading?: boolean;
   submitLabel?: string;
+  size?: "default" | "large";
 }
 
-export function CrudModal({ open, onClose, title, children, onSubmit, loading, submitLabel = "Salvar" }: CrudModalProps) {
+export function CrudModal({ open, onClose, title, children, onSubmit, loading, submitLabel = "Salvar", size = "default" }: CrudModalProps) {
   if (!open) return null;
+  const maxWidth = size === "large" ? "max-w-3xl" : "max-w-lg";
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto border border-border/40" onClick={e => e.stopPropagation()}>
+      <div className={`bg-card rounded-2xl shadow-xl w-full ${maxWidth} max-h-[85vh] overflow-y-auto border border-border/40`} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b border-border/30">
           <h2 className="text-lg font-bold text-foreground">{title}</h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>

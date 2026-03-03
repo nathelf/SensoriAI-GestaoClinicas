@@ -335,6 +335,7 @@ CREATE TABLE IF NOT EXISTS public.clinic_documents (
   document_type TEXT NOT NULL DEFAULT 'termo',
   content TEXT,
   active BOOLEAN NOT NULL DEFAULT true,
+  is_template BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE public.clinic_documents ENABLE ROW LEVEL SECURITY;

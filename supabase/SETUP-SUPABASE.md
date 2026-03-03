@@ -56,6 +56,21 @@ supabase db push
 
 ---
 
+## 3.1. Documentos e Termos (se aparecer "Erro ao criar")
+
+Se ao criar ou editar um documento aparecer **"Erro ao criar"** e no console: `Could not find the 'is_template' column`:
+
+1. Abra o **SQL Editor** no Supabase.
+2. Execute:
+
+```sql
+ALTER TABLE public.clinic_documents ADD COLUMN IF NOT EXISTS is_template BOOLEAN NOT NULL DEFAULT false;
+```
+
+3. Depois rode de novo a criação do documento.
+
+---
+
 ## 4. Chat da Anna (Edge Function)
 
 Para o chat usar IA:
@@ -63,6 +78,16 @@ Para o chat usar IA:
 1. **Edge Functions** → **anna-chat** → **Secrets**  
 2. Crie o secret **OPENAI_API_KEY** com sua chave de uma API compatível com OpenAI (OpenAI, Together, Groq, etc.)  
 3. Opcional: **OPENAI_API_BASE** (URL base) e **CHAT_MODEL** (modelo)
+
+## 4.1. Documentos – Gerar com IA (Edge Function generate-document)
+
+Para o botão **"Gerar com IA"** em Documentos e Termos:
+
+1. **Edge Functions** → **generate-document** → **Secrets**  
+2. Crie o secret **GEMINI_API_KEY** com sua chave do [Google AI Studio](https://aistudio.google.com/).  
+3. Faça o deploy da função (Supabase CLI: `supabase functions deploy generate-document`).
+
+Se aparecer **erro de CORS** ao gerar com IA no navegador, confira se a Edge Function está deployada e se a **Site URL** em **Authentication** → **URL Configuration** inclui sua origem (ex.: `http://localhost:8080`).
 
 ---
 

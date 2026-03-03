@@ -48,7 +48,6 @@ export async function gerarPdfAssinado(
   const imgH = (canvas.height * imgW) / canvas.width;
 
   // 2. Adiciona o conteúdo ao PDF (uma ou mais páginas conforme a altura)
-  let yOffset = margin;
   let remaining = imgH;
   let pageIndex = 0;
 
@@ -60,32 +59,90 @@ export async function gerarPdfAssinado(
     pageIndex++;
   }
 
-  // 3. Página final para certificado de assinatura
+  // 3. Página final: Certificado de Assinatura Eletrônica
   doc.addPage();
   doc.setPage(doc.getNumberOfPages());
+  const protocolo = `SENTINEL-${dadosSeguranca.docId.slice(0, 8).toUpperCase()}`;
+
+  doc.setFontSize(10);
+  doc.setTextColor(155, 135, 245); // #9b87f5
+  doc.text("Certificado de Assinatura Eletrônica", pageW / 2, 15, { align: "center" });
+  doc.setFontSize(7);
+  doc.setTextColor(80, 80, 80);
+  doc.text(`Protocolo: ${protocolo}`, pageW / 2, 22, { align: "center" });
 
   // Imagem da assinatura centralizada
-  doc.addImage(assinaturaBase64, "PNG", (pageW - 70) / 2, 20, 70, 30);
+  doc.addImage(assinaturaBase64, "PNG", (pageW - 70) / 2, 28, 70, 30);
 
   // Linha e texto "Assinado digitalmente por..."
   doc.setFontSize(8);
-  doc.text("__________________________________________", pageW / 2, 55, { align: "center" });
+  doc.setTextColor(0, 0, 0);
+  doc.text("__________________________________________", pageW / 2, 65, { align: "center" });
   doc.text(
-    `Assinado digitalmente por ${dadosSeguranca.nome || "Signatário"} em ${dadosSeguranca.data}`,
+    `Assinado eletronicamente via SensoriAI por ${dadosSeguranca.nome || "Signatário"} em ${dadosSeguranca.data}`,
     pageW / 2,
-    62,
+    72,
     { align: "center" }
   );
 
-  // Rodapé com prova digital
+  // Rodapé de auditoria
   doc.setFontSize(7);
   doc.setTextColor(120, 120, 120);
   doc.text(
-    `IP: ${dadosSeguranca.ip || "—"} | ID: ${dadosSeguranca.docId} | Hash: ${dadosSeguranca.hash}`,
+    `Documento assinado digitalmente | IP: ${dadosSeguranca.ip || "—"} | Timestamp: ${dadosSeguranca.data} | ID: ${dadosSeguranca.docId} | Hash: ${dadosSeguranca.hash}`,
     margin,
-    85,
+    88,
     { maxWidth: pageW - 2 * margin }
   );
 
   return doc;
+}
+
+/**
+ * Gera PDF rascunho (apenas conteúdo) a partir de HTML. Usa um elemento temporário para html2canvas.
+ */
+export async function gerarPdfRascunho(htmlContent: string, titulo: string): Promise<jsPDF> {
+  const temp = document.createElement("div");
+  temp.innerHTML = htmlContent || "<p>Sem conteúdo.</p>";
+  temp.style.position = "fixed";
+  temp.style.left = "-9999px";
+  temp.style.top = "0";
+  temp.style.width = "800px";
+  temp.style.background = "#fff";
+  temp.style.padding = "20px";
+  temp.style.fontFamily = "Arial, sans-serif";
+  document.body.appendChild(temp);
+
+  try {
+    const canvas = await html2canvas(temp, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: "#ffffff",
+    });
+    document.body.removeChild(temp);
+
+    const doc = new jsPDF("p", "mm", "a4");
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 10;
+    const contentW = pageW - 2 * margin;
+    const imgData = canvas.toDataURL("image/png");
+    const imgH = (canvas.height * contentW) / canvas.width;
+    const contentAreaH = pageH - 2 * margin;
+
+    let remaining = imgH;
+    let pageIndex = 0;
+    while (remaining > 0) {
+      if (pageIndex > 0) doc.addPage();
+      const y = margin - (imgH - remaining);
+      doc.addImage(imgData, "PNG", margin, y, contentW, imgH);
+      remaining -= contentAreaH;
+      pageIndex++;
+    }
+    return doc;
+  } catch {
+    document.body.removeChild(temp);
+    throw new Error("Erro ao gerar PDF.");
+  }
 }

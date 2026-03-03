@@ -20,6 +20,8 @@ import AgendaLinks from "./pages/AgendaLinks";
 import Pacientes from "./pages/Pacientes";
 import CliniDocs from "./pages/CliniDocs";
 import DocumentoAssinatura from "./pages/DocumentoAssinatura";
+import DocumentosConversor from "./pages/DocumentosConversor";
+import AssinarPorToken from "./pages/AssinarPorToken";
 import Comunicacao from "./pages/Comunicacao";
 import Financeiro from "./pages/Financeiro";
 import Vendas from "./pages/Vendas";
@@ -88,6 +90,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/assinar" element={<AssinarPorToken />} />
 
             {/* Protected routes */}
             <Route element={<AppLayout />}>
@@ -103,6 +106,7 @@ const App = () => (
               <Route path="/agenda/links" element={<AgendaLinks />} />
               <Route path="/pacientes" element={<Pacientes />} />
               <Route path="/clinidocs" element={<CliniDocs />} />
+              <Route path="/documentos/conversor" element={<DocumentosConversor />} />
               <Route path="/documentos/assinatura/:id" element={<DocumentoAssinatura />} />
               <Route path="/comunicacao" element={<Comunicacao />} />
               <Route path="/pacientes/comunicacao" element={<PacientesComunicacao />} />

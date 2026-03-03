@@ -31,6 +31,7 @@ const navSections: NavSection[] = [
     basePath: "/atendimento",
     items: [
       { label: "Novo Atendimento", path: "/novo-atendimento" },
+      { label: "Documentos e Termos", path: "/clinidocs" },
       { label: "Histórico Clínico", path: "/historico" },
       { label: "Galeria de Evolução", path: "/galeria" },
     ],
@@ -67,6 +68,7 @@ const navSections: NavSection[] = [
     basePath: "/documentos",
     items: [
       { label: "Documentos e Termos", path: "/clinidocs" },
+      { label: "Conversor de Documentos", path: "/documentos/conversor" },
       { label: "Comunicação", path: "/comunicacao" },
     ],
   },
