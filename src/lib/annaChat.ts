@@ -1,11 +1,10 @@
-/**
- * API do chat Anna (Supabase Edge Function).
- * Usado pelo widget flutuante e pela página /sensori/chat.
- */
+import { supabase } from "@/integrations/supabase/client";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/anna-chat`;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const CHAT_URL = `${SUPABASE_URL}/functions/v1/anna-chat`;
 
 export async function streamAnnaChat({
   messages,
@@ -16,50 +15,32 @@ export async function streamAnnaChat({
   onDelta: (text: string) => void;
   onDone: () => void;
 }) {
-  const resp = await fetch(CHAT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-    body: JSON.stringify({ messages }),
-  });
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    const session = data.session;
 
-  if (resp.status === 429) {
-    onDone();
-    return "rate_limit";
-  }
-  if (resp.status === 402) {
-    onDone();
-    return "credits";
-  }
-  if (!resp.ok || !resp.body) throw new Error("Failed to start stream");
+    if (error) throw error;
+    if (!session?.access_token) throw new Error("Sem sessão. Faça login novamente.");
 
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buf = "";
-  let done = false;
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        apikey: ANON_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messages }),
+    });
 
-  while (!done) {
-    const { done: rd, value } = await reader.read();
-    if (rd) break;
-    buf += decoder.decode(value, { stream: true });
-
-    let idx: number;
-    while ((idx = buf.indexOf("\n")) !== -1) {
-      let line = buf.slice(0, idx);
-      buf = buf.slice(idx + 1);
-      if (line.endsWith("\r")) line = line.slice(0, -1);
-      if (!line.startsWith("data: ")) continue;
-      const json = line.slice(6).trim();
-      if (json === "[DONE]") { done = true; break; }
-      try {
-        const parsed = JSON.parse(json);
-        const c = parsed.choices?.[0]?.delta?.content;
-        if (c) onDelta(c);
-      } catch { buf = line + "\n" + buf; break; }
+    if (!resp.ok) {
+      const t = await resp.text().catch(() => "");
+      throw new Error(`AnnaChat error (${resp.status}): ${t}`);
     }
+
+    const { reply } = await resp.json();
+    onDelta(String(reply ?? ""));
+    return "ok";
+  } finally {
+    onDone();
   }
-  onDone();
-  return "ok";
 }

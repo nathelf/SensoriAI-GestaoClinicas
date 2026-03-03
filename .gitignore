@@ -27,3 +27,6 @@ dist-ssr
 backend/venv
 backend/temp_files
 backend/__pycache__
+supabase/.temp/
+e/.temp/
+supabase/.temp/

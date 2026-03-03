@@ -23,35 +23,30 @@ export function AnnaChat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, loading]);
 
   const send = async () => {
     if (!input.trim() || loading) return;
+
     const userMsg: Msg = { role: "user", content: input.trim() };
     setInput("");
-    setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    let assistantSoFar = "";
-    const upsert = (chunk: string) => {
-      assistantSoFar += chunk;
-      setMessages(prev => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant") {
-          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
-        }
-        return [...prev, { role: "assistant", content: assistantSoFar }];
-      });
-    };
+    // otimista: já coloca a msg do usuário na tela
+    setMessages((prev) => [...prev, userMsg]);
 
     try {
-      const result = await streamAnnaChat({
-        messages: [...messages, userMsg],
-        onDelta: upsert,
+      // envia só as últimas 10 mensagens + a atual
+      const toSend = [...messages, userMsg].slice(-10);
+
+      await streamAnnaChat({
+        messages: toSend,
+        onDelta: (fullText) => {
+          // ✅ adiciona a resposta como uma nova mensagem (sem "stream/upsert")
+          setMessages((prev) => [...prev, { role: "assistant", content: fullText }]);
+        },
         onDone: () => setLoading(false),
       });
-      if (result === "rate_limit") toast.error("Muitas requisições. Aguarde alguns segundos.");
-      else if (result === "credits") toast.error("Créditos de IA esgotados.");
     } catch (e) {
       console.error(e);
       setLoading(false);
@@ -63,7 +58,7 @@ export function AnnaChat() {
     <>
       {/* FAB */}
       <button
-        onClick={() => setOpen(prev => !prev)}
+        onClick={() => setOpen((prev) => !prev)}
         className="fixed bottom-24 lg:bottom-6 right-20 lg:right-24 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-pastel-rose text-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
       >
         {open ? <X className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
@@ -98,28 +93,35 @@ export function AnnaChat() {
                   <p className="mt-1">Como posso ajudar você hoje?</p>
                 </div>
               )}
+
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-md"
-                      : "bg-muted text-foreground rounded-bl-md"
-                  }`}>
+                  <div
+                    className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm ${
+                      msg.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted text-foreground rounded-bl-md"
+                    }`}
+                  >
                     {msg.role === "assistant" ? (
                       <div className="prose prose-sm max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div>
-                    ) : msg.content}
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
               ))}
-              {loading && messages[messages.length - 1]?.role === "user" && (
+
+              {loading && (
                 <div className="flex justify-start">
                   <div className="bg-muted px-3.5 py-2.5 rounded-2xl rounded-bl-md">
                     <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                   </div>
                 </div>
               )}
+
               <div ref={bottomRef} />
             </div>
 
@@ -128,8 +130,8 @@ export function AnnaChat() {
               <div className="flex gap-2">
                 <input
                   value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && !e.shiftKey && send()}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
                   placeholder="Pergunte algo à Anna..."
                   className="flex-1 px-3.5 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 outline-none"
                 />

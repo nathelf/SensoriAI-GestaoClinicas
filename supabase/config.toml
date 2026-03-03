@@ -1,1 +1,4 @@
-project_id = "plnzfvixwspwpbqcosjd"
+project_id = "qdolsrosokpbclmtfjgh"
+
+[functions.anna-chat]
+verify_jwt = true
