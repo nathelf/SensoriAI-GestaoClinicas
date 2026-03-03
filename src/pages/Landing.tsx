@@ -232,9 +232,9 @@ export default function Landing() {
     return () => window.removeEventListener("mousemove", onGlobalMouseMove);
   }, []);
 
-  // Redireciona usuário logado para o dashboard (sem bloquear a tela enquanto loading)
+  // Redireciona usuário logado e com e-mail confirmado para o dashboard
   useEffect(() => {
-    if (!loading && user) navigate("/dashboard", { replace: true });
+    if (!loading && user && user.email_confirmed_at) navigate("/dashboard", { replace: true });
   }, [loading, user, navigate]);
 
   return (
