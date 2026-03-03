@@ -7,11 +7,8 @@ import { AuthProvider } from "./hooks/useAuth";
 import { AppLayout } from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
-<<<<<<< HEAD
-=======
 import Landing from "./pages/Landing";
 import Sobre from "./pages/Sobre";
->>>>>>> 4c4f42b (landingpage tela de login atualizadas)
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Perfil from "./pages/Perfil";
@@ -92,11 +89,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             {/* Public routes */}
-<<<<<<< HEAD
-=======
             <Route path="/" element={<Landing />} />
             <Route path="/sobre" element={<Sobre />} />
->>>>>>> 4c4f42b (landingpage tela de login atualizadas)
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
