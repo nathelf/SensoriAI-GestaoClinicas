@@ -94,7 +94,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] relative flex items-center justify-center p-3 sm:p-4 overflow-hidden bg-[hsl(var(--pastel-ice))] safe-top safe-bottom">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-[hsl(var(--pastel-ice))]">
       {/* Gradiente suave pastel de fundo */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--pastel-lavender)/0.6)] via-[hsl(var(--pastel-ice))] to-[hsl(var(--pastel-mint)/0.4)]" />
@@ -114,8 +114,8 @@ export default function Auth() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[hsl(var(--primary)/0.12)] blur-[80px]" />
       </div>
 
-      {/* Ícones dos módulos flutuando (ocultos no mobile para performance e para não atrapalhar o formulário) */}
-      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden hidden md:block">
+      {/* Ícones dos módulos flutuando */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
         {authModules.map((mod, i) => (
           <motion.div
             key={mod.label}

@@ -138,24 +138,6 @@
     @apply bg-primary text-primary-foreground rounded-xl font-medium;
   }
 
-  .bottom-safe-area {
-    padding-bottom: env(safe-area-inset-bottom, 16px);
-  }
-
-  /* Touch targets mínimos (44px) para mobile */
-  .touch-target {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  /* Safe areas para notched devices */
-  .safe-top {
-    padding-top: env(safe-area-inset-top, 0);
-  }
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
   /* Letreiro contínuo neon (faixa hero) */
   :root {
     --landing-marquee-duration: 28s;
