@@ -99,6 +99,7 @@ const App = () => (
             {/* Protected routes */}
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/alertas-retorno" element={<AlertasRetorno />} />
