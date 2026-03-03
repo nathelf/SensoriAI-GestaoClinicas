@@ -173,14 +173,14 @@ function RelatoriosDemo() {
   const canDraw = showLine && lineStart && lineEnd;
 
   return (
-    <div ref={containerRef} className="lg:col-span-3 relative h-[320px] sm:h-[380px] lg:h-[450px] rounded-xl sm:rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px]" />
+    <div ref={containerRef} className="relative h-[320px] sm:h-[380px] lg:h-[450px] rounded-xl sm:rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-visible cursor-auto min-w-[320px]">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] rounded-xl sm:rounded-2xl" />
       {!connected && !isDragging && (
-        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20">Arraste do ponto roxo até o outro bloco para conectar</p>
+        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20 whitespace-nowrap">Arraste do ponto roxo até o outro bloco para conectar</p>
       )}
       {/* Linha: posições lidas dos refs para alinhar exatamente nos centros das bolinhas */}
       {canDraw && (
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 rounded-xl sm:rounded-2xl" style={{ overflow: "visible" }}>
           <path
             d={`M ${lineStart.x} ${lineStart.y} C ${lineStart.x + 60} ${lineStart.y}, ${lineEnd.x - 60} ${lineEnd.y}, ${lineEnd.x} ${lineEnd.y}`}
             stroke="#a855f7"
@@ -192,12 +192,12 @@ function RelatoriosDemo() {
         </svg>
       )}
       {/* Bloco superior */}
-      <div className="absolute top-12 left-10 w-72 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border p-4 z-10">
-        <div className="flex items-center gap-3 mb-4">
-          <Stethoscope className="w-5 h-5 text-purple-600" />
-          <span className="font-semibold text-foreground">Histórico do Paciente</span>
+      <div className="absolute top-8 sm:top-12 left-4 sm:left-10 w-52 sm:w-64 lg:w-72 max-w-[calc(100%-5rem)] bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border p-3 sm:p-4 z-10">
+        <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
+          <span className="font-semibold text-foreground text-sm sm:text-base truncate">Histórico do Paciente</span>
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-2 sm:space-y-2.5">
           <div className="h-2 w-full bg-muted/60 rounded-full" />
           <div className="h-2 w-2/3 bg-muted/60 rounded-full" />
         </div>
@@ -213,22 +213,22 @@ function RelatoriosDemo() {
         />
       </div>
       {/* Bloco inferior */}
-      <div className="absolute bottom-16 right-10 w-72 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-border p-4 z-10">
+      <div className="absolute bottom-12 sm:bottom-16 right-4 sm:right-10 w-52 sm:w-64 lg:w-72 max-w-[calc(100%-5rem)] bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-border p-3 sm:p-4 z-10">
         <div
           ref={targetDotRef}
           className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
           aria-hidden
         />
-        <div className="flex items-center gap-3 mb-4">
-          <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
+        <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <SensoriAILogo variant="icon" iconClassName="w-4 h-4 sm:w-5 sm:h-5" noTextFallback />
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-2 sm:space-y-2.5">
           <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
           <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
           <div className="h-2 w-1/2 bg-purple-100 dark:bg-purple-900/30 rounded-full" />
         </div>
         {connected && (
-          <p className="mt-3 text-sm text-primary font-medium">Conectado. É assim que você liga os blocos na plataforma.</p>
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-primary font-medium">Conectado. É assim que você liga os blocos na plataforma.</p>
         )}
       </div>
     </div>
@@ -459,15 +459,28 @@ export default function Landing() {
             </motion.div>
           </div>
 
-          {/* Faixa integrações: 4 blocos de 25% cada = loop sem espaço em branco */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="group absolute bottom-4 left-0 right-0 w-full overflow-hidden border-y border-border/20 bg-background/30 backdrop-blur-md py-3">
+          {/* Letreiro contínuo neon: faixa em movimento infinito */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="absolute bottom-4 left-0 right-0 w-full overflow-hidden border-y border-primary/30 bg-foreground/5 backdrop-blur-md py-3.5 shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2),inset_0_1px_0_hsl(var(--primary)/0.1)]"
+          >
             <div className="flex w-[400%] landing-marquee will-change-transform">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="shrink-0 w-1/4 flex items-center justify-evenly opacity-50 group-hover:opacity-100 transition-opacity duration-500">
-                  <span className="shrink-0 text-sm font-bold uppercase tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500 shrink-0"/> Relatórios Automatizados </span>
-                  <span className="shrink-0 text-sm font-bold uppercase tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500 shrink-0"/> Agenda Dinâmica </span>
-                  <span className="shrink-0 text-sm font-bold uppercase tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0"/> Prontuários Inteligentes</span>
-                  <span className="shrink-0 text-sm font-bold uppercase tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500 shrink-0"/> Integração com IA Personalizada </span>
+                <div key={i} className="shrink-0 w-1/4 flex items-center justify-evenly">
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 shadow-[0_0_8px_2px_rgba(34,197,94,0.6)]" /> Relatórios Automatizados
+                  </span>
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 shadow-[0_0_8px_2px_rgba(59,130,246,0.6)]" /> Agenda Dinâmica
+                  </span>
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Inteligentes
+                  </span>
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Integração com IA Personalizada
+                  </span>
                 </div>
               ))}
             </div>
@@ -486,7 +499,7 @@ export default function Landing() {
               initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8 }}
               className="relative rounded-xl sm:rounded-[2rem] overflow-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-4 sm:p-8 lg:p-12 shadow-2xl"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-12 items-center relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-12 items-start relative z-10">
                 <div className="lg:col-span-2 space-y-5 sm:space-y-8 order-2 lg:order-1">
                   <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
                     <Workflow className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -511,8 +524,10 @@ export default function Landing() {
                   </ul>
                 </div>
                 
-                <div className="order-1 lg:order-2 min-h-[280px] sm:min-h-0">
-                  <RelatoriosDemo />
+                <div className="order-1 lg:order-2 w-full min-h-[280px] sm:min-h-0 flex justify-center overflow-x-auto overflow-y-visible scrollbar-thin">
+                  <div className="min-w-[520px] w-full max-w-full flex justify-center">
+                    <RelatoriosDemo />
+                  </div>
                 </div>
               </div>
             </motion.div>
