@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { SensoriAILogo } from "@/components/SensoriAILogo";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, hasSupabaseConfig } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const float = {
@@ -181,6 +181,12 @@ export default function Auth() {
             boxShadow: "0 0 0 1px rgba(255,255,255,0.8), 0 0 50px hsl(var(--primary)/0.12), 0 25px 50px -12px rgba(0,0,0,0.08)",
           }}
         >
+          {!hasSupabaseConfig && (
+            <div className="mb-6 p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-200 text-sm">
+              <p className="font-medium mb-1">Banco não configurado</p>
+              <p>Defina <code className="bg-black/10 px-1 rounded">VITE_SUPABASE_URL</code> e <code className="bg-black/10 px-1 rounded">VITE_SUPABASE_PUBLISHABLE_KEY</code> no .env (local) ou nas variáveis de ambiente do Vercel e faça redeploy.</p>
+            </div>
+          )}
           <div className="flex rounded-2xl bg-muted/60 p-1.5 mb-8 border border-border/50">
             <button
               type="button"

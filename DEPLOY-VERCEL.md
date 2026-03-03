@@ -13,12 +13,14 @@ No painel do projeto na Vercel: **Settings → Environment Variables**. Use os m
 
 | Variável | Obrigatória | Descrição |
 |----------|-------------|-----------|
-| `VITE_SUPABASE_URL` | Sim | URL do projeto Supabase |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Sim | Chave anônima (public) do Supabase |
+| `VITE_SUPABASE_URL` | Sim | URL do projeto (ex.: `https://xxxxx.supabase.co`) — em **Supabase → Settings → API → Project URL** |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Sim | Chave **anon (public)** — em **Supabase → Settings → API → Project API keys → anon public**. É um JWT longo que começa com `eyJ`. Não use outra chave. |
 | `VITE_SUPABASE_PROJECT_ID` | Opcional | ID do projeto (se você usar em algum lugar) |
 | `VITE_DOCUMENT_API_URL` | Opcional | URL do backend do conversor PDF/Word (se usar) |
 
-**Importante:** no Supabase, em **Authentication → URL Configuration**, adicione a URL da Vercel em **Redirect URLs** (ex.: `https://seu-projeto.vercel.app/**`).
+**Importante:**  
+- No Vite, variáveis `VITE_*` são embutidas no build. Depois de alterar variáveis na Vercel, é obrigatório **fazer um novo deploy** (Redeploy) para o app conectar ao banco.  
+- No Supabase: **Authentication → URL Configuration** → adicione a URL da Vercel em **Redirect URLs** (ex.: `https://seu-projeto.vercel.app/**`).
 
 ## Como fazer o deploy
 
