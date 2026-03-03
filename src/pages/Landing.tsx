@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import {
   Calendar,
@@ -195,7 +195,6 @@ type AssistantChoice = null | "saved" | "declined";
 
 export default function Landing() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [assistantChoice, setAssistantChoice] = useState<AssistantChoice>(null);
@@ -231,11 +230,6 @@ export default function Landing() {
     window.addEventListener("mousemove", onGlobalMouseMove);
     return () => window.removeEventListener("mousemove", onGlobalMouseMove);
   }, []);
-
-  // Redireciona usuário logado e com e-mail confirmado para o dashboard
-  useEffect(() => {
-    if (!loading && user && user.email_confirmed_at) navigate("/dashboard", { replace: true });
-  }, [loading, user, navigate]);
 
   return (
     <div

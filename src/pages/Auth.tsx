@@ -74,7 +74,7 @@ export default function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
-        navigate("/");
+        navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
           email,
