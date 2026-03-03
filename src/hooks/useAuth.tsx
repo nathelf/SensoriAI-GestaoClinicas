@@ -40,6 +40,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /** Garante que o perfil existe no banco e está em sync com auth (email ou Google). */
+  const ensureUserProfile = async (user: User) => {
+    const meta = user.user_metadata ?? {};
+    const display_name =
+      meta.display_name ?? meta.full_name ?? meta.name ?? user.email ?? null;
+    const avatar_url = meta.avatar_url ?? meta.picture ?? null;
+    await supabase.from("profiles").upsert(
+      {
+        user_id: user.id,
+        display_name,
+        avatar_url,
+      },
+      { onConflict: "user_id" }
+    );
+  };
+
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
@@ -64,6 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          try {
+            await ensureUserProfile(session.user);
+          } catch (_) {
+            // upsert pode falhar se RLS não permitir; o trigger já criou o perfil
+          }
           setTimeout(() => {
             fetchProfile(session.user.id);
             fetchRole(session.user.id);
@@ -76,10 +97,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        try {
+          await ensureUserProfile(session.user);
+        } catch (_) {}
         fetchProfile(session.user.id);
         fetchRole(session.user.id);
       }

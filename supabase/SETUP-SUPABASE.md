@@ -49,10 +49,19 @@ supabase db push
 
 1. No dashboard: **Authentication** → **Providers**  
 2. **Email:** já habilitado por padrão  
-3. **Google (opcional):** ative e preencha Client ID e Client Secret do [Google Cloud Console](https://console.cloud.google.com/apis/credentials)  
-4. Em **URL Configuration**, confira:
-   - **Site URL:** a URL do seu app (ex.: `http://localhost:8080` em dev)  
-   - **Redirect URLs:** inclua a mesma URL (ex.: `http://localhost:8080`)
+3. **Google (Entrar com Google):**
+   - Ative o provedor **Google**
+   - No [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie credenciais **OAuth 2.0** (tipo “Aplicativo da Web”)
+   - Em “URIs de redirecionamento autorizados” adicione: `https://<SEU_PROJECT_REF>.supabase.co/auth/v1/callback`
+   - Copie **Client ID** e **Client Secret** e cole em **Authentication** → **Providers** → **Google**
+4. Em **URL Configuration** (Authentication → URL Configuration), confira:
+   - **Site URL:** a URL do seu app (ex.: `http://localhost:5173` em dev ou sua URL de produção)
+   - **Redirect URLs:** inclua **todas** as URLs onde o app pode receber o retorno do login:
+     - `http://localhost:5173`
+     - `http://localhost:5173/dashboard`
+     - Sua URL de produção (ex.: `https://seudominio.com`, `https://seudominio.com/dashboard`)
+   - Sem essas URLs, o “Entrar com Google” pode falhar após o usuário autorizar.
+5. Os dados do usuário (nome, avatar, e-mail) são sempre salvos na tabela `profiles`, tanto para login por e-mail quanto para Google. O trigger `handle_new_user` e o app fazem o upsert automaticamente.
 
 ---
 

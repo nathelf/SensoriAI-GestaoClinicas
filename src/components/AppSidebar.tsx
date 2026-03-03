@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Home, Calendar, UserPlus, Users, Brain,
+  Home, Calendar, UserPlus, Users,
   ChevronDown, Stethoscope, DollarSign, Package,
   Settings, MessageSquare, FileText, Menu, X, Shield
 } from "lucide-react";
+import { SensoriAILogo } from "@/components/SensoriAILogo";
 import { useAuth } from "@/hooks/useAuth";
 
 interface NavSection {
@@ -13,6 +14,7 @@ interface NavSection {
   icon: React.ElementType;
   basePath: string;
   items: { label: string; path: string }[];
+  useLogo?: boolean;
 }
 
 const navSections: NavSection[] = [
@@ -115,8 +117,9 @@ const navSections: NavSection[] = [
   },
   {
     title: "SensoriAI Lab",
-    icon: Brain,
+    icon: MessageSquare,
     basePath: "/sensori",
+    useLogo: true,
     items: [
       { label: "Assistente de Vendas", path: "/sensori/chat" },
       { label: "Análise Facial IA", path: "/sensori/analisador" },
@@ -196,6 +199,7 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
           ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="flex items-center justify-between px-5 py-5 border-b border-border/30">
+<<<<<<< HEAD
           <Link to="/" className="flex items-center gap-2.5" onClick={onClose}>
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
               <Brain className="w-5 h-5 text-primary-foreground" />
@@ -204,6 +208,10 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
               <span className="font-bold text-base text-foreground tracking-tight">Sensori</span>
               <span className="font-bold text-base text-primary tracking-tight">AI</span>
             </div>
+=======
+          <Link to="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
+            <SensoriAILogo variant="full" iconClassName="w-9 h-9" />
+>>>>>>> 4c4f42b (landingpage tela de login atualizadas)
           </Link>
           <button onClick={onClose} className="lg:hidden p-1 rounded-lg hover:bg-muted">
             <X className="w-5 h-5 text-muted-foreground" />
@@ -227,7 +235,11 @@ export function AppSidebar({ open, onClose }: SidebarProps) {
                     ${sectionActive ? "bg-pastel-lavender text-primary" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="w-[18px] h-[18px]" />
+                    {"useLogo" in section && section.useLogo ? (
+                      <SensoriAILogo variant="icon" iconClassName="w-[18px] h-[18px]" noTextFallback />
+                    ) : (
+                      <Icon className="w-[18px] h-[18px]" />
+                    )}
                     <span>{section.title}</span>
                   </div>
                   <ChevronDown

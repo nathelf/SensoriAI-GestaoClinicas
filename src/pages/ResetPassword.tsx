@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Brain, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
+import { SensoriAILogo } from "@/components/SensoriAILogo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -34,8 +35,8 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary mx-auto flex items-center justify-center mb-4">
-            <Brain className="w-8 h-8 text-primary-foreground" />
+          <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 overflow-hidden">
+            <SensoriAILogo variant="icon" iconClassName="w-10 h-10" noTextFallback />
           </div>
           <h1 className="text-xl font-bold text-foreground">Nova senha</h1>
         </div>

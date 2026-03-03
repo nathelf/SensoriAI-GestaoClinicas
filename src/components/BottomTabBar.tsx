@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Calendar, Plus, Users, Brain } from "lucide-react";
+import { Home, Calendar, Plus, Users } from "lucide-react";
+import { SensoriAILogo } from "@/components/SensoriAILogo";
 
 const tabs = [
   { icon: Home, label: "Início", path: "/" },
   { icon: Calendar, label: "Agenda", path: "/agenda" },
   { icon: Plus, label: "Novo", path: "/novo-atendimento", isCenter: true },
   { icon: Users, label: "Clientes", path: "/pacientes" },
-  { icon: Brain, label: "IA", path: "/sensori/chat" },
+  { icon: Home, label: "IA", path: "/sensori/chat", useLogo: true },
 ];
 
 export function BottomTabBar() {
@@ -40,9 +41,15 @@ export function BottomTabBar() {
               to={tab.path}
               className="flex flex-col items-center py-1 min-w-[48px]"
             >
-              <Icon
-                className={`w-5 h-5 transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}
-              />
+              {"useLogo" in tab && tab.useLogo ? (
+                <div className={isActive ? "text-primary" : "text-muted-foreground"}>
+                  <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
+                </div>
+              ) : (
+                <Icon
+                  className={`w-5 h-5 transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}
+                />
+              )}
               <span
                 className={`text-[10px] mt-0.5 transition-colors ${isActive ? "text-primary font-semibold" : "text-muted-foreground"}`}
               >
