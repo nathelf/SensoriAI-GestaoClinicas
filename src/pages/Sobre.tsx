@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronRight, ArrowRight, Target, LayoutDashboard, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SensoriAILogo } from "@/components/SensoriAILogo";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -142,12 +143,7 @@ export default function Sobre() {
         </div>
       </main>
 
-      <footer className="border-t border-border py-12 bg-card text-center">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <SensoriAILogo variant="full" iconClassName="w-6 h-6" />
-        </div>
-        <p className="text-muted-foreground">© 2026 SensoriAI. Desenvolvido para transformar a saúde.</p>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }

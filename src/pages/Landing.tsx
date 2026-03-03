@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { HeroParticleNetwork } from "@/components/landing/HeroParticleNetwork";
 import { LandingCursor } from "@/components/landing/LandingCursor";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 
 // --- Animações Premium ---
 const fadeUp = {
@@ -248,7 +249,7 @@ export default function Landing() {
 
   return (
     <div
-      className="min-h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/20 cursor-none"
+      className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20 cursor-none"
       onMouseEnter={() => setCursorVisible(true)}
       onMouseLeave={() => setCursorVisible(false)}
     >
@@ -315,7 +316,7 @@ export default function Landing() {
         </div>
       </header>
 
-      <main className="relative z-10 pt-24 sm:pt-32">
+      <main className="relative z-10 flex-1 pt-24 sm:pt-32">
         {/* --- Hero Section --- */}
         <section
           className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-visible"
@@ -650,7 +651,7 @@ export default function Landing() {
         </section>
 
         {/* --- CTA Final --- */}
-        <section className="py-32 relative text-center px-4">
+        <section className="pt-32 pb-12 relative text-center px-4">
           <h2 className="text-5xl font-black text-foreground mb-6">Pronto para a evolução?</h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Junte-se às clínicas que estão automatizando processos e focando no que importa: o paciente.
@@ -663,12 +664,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-border py-12 bg-card text-center">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <SensoriAILogo variant="full" iconClassName="w-6 h-6" />
-        </div>
-        <p className="text-muted-foreground">© 2026 SensoriAI. Desenvolvido para transformar a saúde.</p>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }

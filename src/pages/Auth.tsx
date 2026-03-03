@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SensoriAILogo } from "@/components/SensoriAILogo";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -94,7 +95,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-[hsl(var(--pastel-ice))]">
+    <div className="min-h-screen flex flex-col bg-[hsl(var(--pastel-ice))]">
+      <div className="flex-1 relative flex items-center justify-center p-4 overflow-hidden min-h-0">
       {/* Gradiente suave pastel de fundo */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--pastel-lavender)/0.6)] via-[hsl(var(--pastel-ice))] to-[hsl(var(--pastel-mint)/0.4)]" />
@@ -314,6 +316,8 @@ export default function Auth() {
           </motion.div>
         </motion.div>
       </motion.div>
+      </div>
+      <LandingFooter />
     </div>
   );
 }
