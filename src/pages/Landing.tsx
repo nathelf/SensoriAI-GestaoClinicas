@@ -219,11 +219,10 @@ export default function Landing() {
   }, [mouseX, mouseY]);
 
   useEffect(() => {
-    if (!loading && user) navigate("/dashboard", { replace: true });
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [user, loading, navigate]);
+  }, []);
 
   useEffect(() => {
     const onGlobalMouseMove = (e: MouseEvent) => {
@@ -233,7 +232,10 @@ export default function Landing() {
     return () => window.removeEventListener("mousemove", onGlobalMouseMove);
   }, []);
 
-  if (loading) return null;
+  // Redireciona usuário logado para o dashboard (sem bloquear a tela enquanto loading)
+  useEffect(() => {
+    if (!loading && user) navigate("/dashboard", { replace: true });
+  }, [loading, user, navigate]);
 
   return (
     <div
