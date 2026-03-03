@@ -22,7 +22,7 @@ import {
   Bot,
   Instagram,
   Linkedin,
-  Twitter,
+  Mail,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -277,14 +277,14 @@ export default function Landing() {
 
       {/* Menu Social lateral fixo (visível apenas xl+) */}
       <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-5" aria-label="Redes sociais">
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="Instagram">
+        <a href="https://www.instagram.com/sensoriai.tech/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="Instagram">
           <Instagram className="w-5 h-5" />
         </a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/company/sensoriai-tech" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="LinkedIn">
           <Linkedin className="w-5 h-5" />
         </a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="Twitter">
-          <Twitter className="w-5 h-5" />
+        <a href="mailto:startup.sensoriai@gmail.com" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" aria-label="E-mail">
+          <Mail className="w-5 h-5" />
         </a>
       </nav>
 
@@ -414,22 +414,22 @@ export default function Landing() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="absolute bottom-4 left-0 right-0 w-full overflow-hidden border-y border-primary/30 bg-foreground/5 backdrop-blur-md py-3.5 shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2),inset_0_1px_0_hsl(var(--primary)/0.1)]"
+            className="absolute bottom-0 left-0 right-0 w-full overflow-hidden border-y border-primary/30 bg-foreground/5 backdrop-blur-md flex items-center justify-center min-h-[3.25rem] shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2),inset_0_1px_0_hsl(var(--primary)/0.1)] translate-y-[7vh]"
           >
-            <div className="flex w-[400%] landing-marquee will-change-transform">
+            <div className="flex w-[400%] landing-marquee will-change-transform items-center h-full">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="shrink-0 w-1/4 flex items-center justify-evenly">
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 shadow-[0_0_8px_2px_rgba(34,197,94,0.6)]" /> Relatórios Automatizados
+                <div key={i} className="shrink-0 w-1/4 flex items-center justify-evenly h-full">
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
+                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(34,197,94,0.6)]" /> Relatórios Automatizados
                   </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 shadow-[0_0_8px_2px_rgba(59,130,246,0.6)]" /> Agenda Dinâmica
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(59,130,246,0.6)]" /> Agenda Dinâmica
                   </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Inteligentes
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Inteligentes
                   </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Integração com IA Personalizada
+                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Integração com IA Personalizada
                   </span>
                 </div>
               ))}
