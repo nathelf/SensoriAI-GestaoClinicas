@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const { user, profile, userRole, loading, signOut } = useAuth();
+  const { user, profile, userRole, loading, hasAccess, signOut } = useAuth();
 
   if (loading) {
     return (
@@ -20,6 +20,7 @@ export function AppLayout() {
   }
 
   if (!user) return <Navigate to="/" replace />;
+  if (!hasAccess) return <Navigate to="/acesso-expirado" replace />;
 
   const initials = profile?.display_name
     ? profile.display_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)

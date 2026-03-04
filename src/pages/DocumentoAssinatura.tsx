@@ -4,6 +4,7 @@ import { ArrowLeft, Download, PenLine } from "lucide-react";
 import SignatureCanvas from "react-signature-canvas";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { gerarPdfAssinado, hashSeguranca } from "@/lib/gerarPdfAssinado";
@@ -19,6 +20,7 @@ export default function DocumentoAssinatura() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { markTaskDone } = useOnboarding();
   const [doc, setDoc] = useState<Doc | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -91,6 +93,7 @@ export default function DocumentoAssinatura() {
 
       if (error) throw error;
       const signedIdNew = (inserted as { id: string }).id;
+      await markTaskDone("documento");
 
       const payloadHash = `${doc.content || ""}|${signedIdNew}|${signedAtIso}`;
       const hash = await hashSeguranca(payloadHash);

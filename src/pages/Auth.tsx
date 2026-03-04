@@ -95,7 +95,20 @@ export default function Auth() {
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       }
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Erro na autenticação";
+      let message = "Erro na autenticação";
+      const err = error as { message?: string; status?: number } | null;
+      if (err && typeof err === "object") {
+        const msg = err.message ? String(err.message) : "";
+        if (err.status === 429 || /429|too many/i.test(msg)) {
+          message = "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.";
+        } else if (err.status === 400 || /400|invalid login|invalid credentials/i.test(msg)) {
+          message = isLogin ? "E-mail ou senha incorretos." : "Dados inválidos. Verifique e-mail e senha (mín. 6 caracteres).";
+        } else if (msg) {
+          message = msg;
+        }
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
       toast.error(message);
     } finally {
       setLoading(false);

@@ -58,7 +58,7 @@ export function SensoriAILogo({
         alt="Sensori AI"
         width={40}
         height={40}
-        fetchPriority="high"
+        fetchpriority="high"
         className={cn(
           "object-contain flex-shrink-0",
           variant === "icon" ? iconClassName : iconClassName,

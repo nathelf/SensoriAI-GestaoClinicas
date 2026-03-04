@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Plus, Pencil, Trash2 } from "lucide-react";
 import { useCrud } from "@/hooks/useCrud";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { CrudModal, FormField, FormInput, FormTextarea, FormSelect } from "@/components/CrudModal";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
@@ -14,6 +15,7 @@ const empty = { patient_id: "", professional_id: "", payment_method_id: "", tota
 
 export default function Vendas() {
   const { data, loading, create, update, remove } = useCrud<Sale>({ table: "sales" });
+  const { markTaskDone } = useOnboarding();
   const { data: patients } = useCrud<Patient>({ table: "patients" });
   const { data: professionals } = useCrud<Professional>({ table: "professionals" });
   const { data: paymentMethods } = useCrud<PaymentMethod>({ table: "payment_methods" });
@@ -29,7 +31,9 @@ export default function Vendas() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     const payload = { patient_id: form.patient_id || null, professional_id: form.professional_id || null, payment_method_id: form.payment_method_id || null, total: parseFloat(form.total), discount: parseFloat(form.discount) || 0, status: form.status || "finalizada", notes: form.notes || null };
+    const isNew = !editing;
     if (editing) await update(editing.id, payload as any); else await create(payload as any);
+    if (isNew) await markTaskDone("venda");
     setSaving(false); setModalOpen(false);
   };
 

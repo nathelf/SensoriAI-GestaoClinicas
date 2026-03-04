@@ -14,6 +14,7 @@ const Sobre = lazy(() => import("./pages/Sobre"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AssinarPorToken = lazy(() => import("./pages/AssinarPorToken"));
+const AcessoExpirado = lazy(() => import("./pages/AcessoExpirado"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -94,6 +95,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/assinar" element={<AssinarPorToken />} />
+              <Route path="/acesso-expirado" element={<AcessoExpirado />} />
 
             {/* Protected routes */}
             <Route element={<AppLayout />}>

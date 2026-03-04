@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { format, addDays, differenceInMilliseconds } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   DollarSign, Users, TrendingUp, CalendarClock, AlertTriangle, ChevronRight,
   Star, CheckCircle2, Info, Copy, X, ArrowRight,
   CalendarDays, Stethoscope, MessageCircle, Banknote, FileText, Sparkles
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useOnboarding, type OnboardingTaskKey } from "@/hooks/useOnboarding";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 
@@ -42,14 +47,6 @@ const stories = [
   { label: "CliniDocs", icon: FileText, isNew: false },
 ];
 
-const initialTasks = [
-  { id: 1, label: "Criar um agendamento", desc: "Dê o passo inicial para ter uma agenda clara, organizada e pronta para crescer.", done: true },
-  { id: 2, label: "Realizar um atendimento", desc: "", done: true },
-  { id: 3, label: "Fazer uma venda", desc: "", done: true },
-  { id: 4, label: "Automatize seus lembretes", desc: "", done: true },
-  { id: 5, label: "Assine um documento", desc: "", done: true },
-];
-
 const upcomingAppointments = [
   { name: "Clara Ribeiro", procedure: "Anamnese, Avaliação", time: "14:00 - 15:00", color: "bg-pastel-lavender/40" },
   { name: "Ana Santos", procedure: "Botox - Testa", time: "15:30 - 16:00", color: "bg-pastel-mint/40" },
@@ -61,14 +58,43 @@ const fadeUp = {
   transition: { duration: 0.35 },
 };
 
+const TRIAL_DAYS = 3;
+const TASK_ROUTES: Record<OnboardingTaskKey, string> = {
+  agendamento: "/agenda",
+  atendimento: "/novo-atendimento",
+  venda: "/vendas",
+  lembretes: "/comunicacao",
+  documento: "/clinidocs",
+};
+
 export default function Dashboard() {
-  const [tasks] = useState(initialTasks);
+  const { profile } = useAuth();
+  const { tasks, progress, loading: onboardingLoading, allDone } = useOnboarding();
   const [storyOpen, setStoryOpen] = useState<number | null>(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
-  const completedCount = tasks.filter(t => t.done).length;
-  const progress = Math.round((completedCount / tasks.length) * 100);
-  const allDone = progress === 100;
+  const [tick, setTick] = useState(0);
+  const trialTimeline = useMemo(() => {
+    const created = profile?.created_at ? new Date(profile.created_at) : null;
+    const expires = profile?.trial_expires_at ? new Date(profile.trial_expires_at) : null;
+    if (!created || !expires) return null;
+    const now = new Date();
+    const reminderDate = addDays(expires, -1);
+    const totalMs = differenceInMilliseconds(expires, created);
+    const elapsedMs = Math.min(differenceInMilliseconds(now, created), totalMs);
+    const progressPercent = totalMs > 0 ? Math.min(100, (elapsedMs / totalMs) * 100) : 0;
+    const steps = [
+      { label: "Início do teste\ngrátis", date: created, active: true },
+      { label: "Lembrete do\nfim do teste", date: reminderDate, active: now >= reminderDate },
+      { label: "Fim do teste\ngrátis", date: expires, active: now >= expires },
+    ];
+    return { steps, progressPercent, created, expires };
+  }, [profile?.created_at, profile?.trial_expires_at, tick]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   const copyCoupon = () => {
     navigator.clipboard.writeText("trial-10off");
@@ -162,28 +188,43 @@ export default function Dashboard() {
         <div className="grid lg:grid-cols-5 gap-4">
           <div className="lg:col-span-3 stat-card !p-6">
             <h3 className="text-lg font-bold text-primary mb-1">
-              Seu período grátis já começou a contar!
+              {profile?.subscription_active
+                ? "Sua assinatura está ativa"
+                : "Seu período grátis já começou a contar!"}
             </h3>
             <p className="text-sm text-muted-foreground mb-5">
-              Use estes dias para explorar as principais ferramentas e ver, na prática, como elas melhoram sua rotina e eleva o potencial da sua clínica.
+              {profile?.subscription_active
+                ? "Você tem acesso completo à plataforma. Aproveite todas as ferramentas para sua clínica."
+                : "Use estes dias para explorar as principais ferramentas e ver, na prática, como elas melhoram sua rotina e eleva o potencial da sua clínica."}
             </p>
-            <div className="relative flex items-center justify-between">
-              <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted rounded-full -translate-y-1/2" />
-              <div className="absolute top-1/2 left-0 h-1 bg-primary rounded-full -translate-y-1/2" style={{ width: "33%" }} />
-              {[
-                { label: "Início do teste\ngrátis", date: "02/03/2026", active: true },
-                { label: "Lembrete do\nfim do teste", date: "07/03/2026", active: false },
-                { label: "Fim do teste\ngrátis", date: "08/03/2026", active: false },
-              ].map((step, i) => (
-                <div key={i} className="relative z-10 flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${i === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                    <Star className="w-4 h-4" />
+            {trialTimeline ? (
+              <div className="relative flex items-center justify-between">
+                <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted rounded-full -translate-y-1/2" />
+                <div
+                  className="absolute top-1/2 left-0 h-1 bg-primary rounded-full -translate-y-1/2 transition-[width] duration-300"
+                  style={{ width: `${trialTimeline.progressPercent}%` }}
+                />
+                {trialTimeline.steps.map((step, i) => (
+                  <div key={i} className="relative z-10 flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        step.active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <Star className="w-4 h-4" />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center mt-2 whitespace-pre-line leading-tight">
+                      {step.label}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {format(step.date, "dd/MM/yyyy", { locale: ptBR })}
+                    </p>
                   </div>
-                  <p className="text-[10px] text-muted-foreground text-center mt-2 whitespace-pre-line leading-tight">{step.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{step.date}</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Carregando suas datas de trial…</p>
+            )}
           </div>
 
           {allDone && (
@@ -217,7 +258,11 @@ export default function Dashboard() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-bold text-primary">
-                nathalia, em poucos minutos nós vamos aumentar a eficiência da sua clínica
+                {(() => {
+                  const firstName = profile?.display_name?.trim().split(/\s+/)[0] || profile?.email?.split("@")[0] || "";
+                  const name = firstName ? `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()}, ` : "";
+                  return `${name}em poucos minutos nós vamos aumentar a eficiência da sua clínica`;
+                })()}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
                 Criei um passo a passo personalizado para preparar sua clínica e facilitar o início do seu trabalho. Pode ficar tranquilo(a), estarei ao seu lado em cada etapa.
@@ -265,10 +310,13 @@ export default function Dashboard() {
                   </span>
                   {task.desc && <p className="text-xs text-muted-foreground mt-0.5">{task.desc}</p>}
                 </div>
-                {i === 0 && (
-                  <button className="flex items-center gap-1 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                {!task.done && (
+                  <Link
+                    to={TASK_ROUTES[task.key]}
+                    className="flex items-center gap-1 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
                     Iniciar tarefa <ArrowRight className="w-3 h-3" />
-                  </button>
+                  </Link>
                 )}
               </div>
             ))}
