@@ -35,9 +35,10 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Pasta do pacote para que "react" e "react/jsx-runtime" resolvam corretamente
-      react: reactDir,
-      "react-dom": reactDomDir,
+      // Só em dev: alias para corrigir forwardRef no lucide-react. No build não usar para não quebrar react/jsx-runtime.
+      ...(command === "build"
+        ? {}
+        : { react: reactDir, "react-dom": reactDomDir }),
     },
     dedupe: ["react", "react-dom"],
   },
