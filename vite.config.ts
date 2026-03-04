@@ -3,18 +3,20 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 const projectRoot = path.resolve(__dirname);
-const reactPath = path.join(projectRoot, "node_modules/react/index.js");
-const reactDomPath = path.join(projectRoot, "node_modules/react-dom/index.js");
+// Alias para a pasta do pacote (não para index.js), senão "react/jsx-runtime" vira ".../react/index.js/jsx-runtime" e quebra
+const reactDir = path.join(projectRoot, "node_modules/react");
+const reactDomDir = path.join(projectRoot, "node_modules/react-dom");
 
-/** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). No build fica desativado para o deploy não falhar. */
+/** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). */
 function forceReactResolution() {
   return {
     name: "force-react-resolution",
     enforce: "pre",
     resolveId(id: string) {
-      if (id === "react") return reactPath;
-      if (id === "react-dom") return reactDomPath;
-      if (id === "react/jsx-runtime") return path.join(projectRoot, "node_modules/react/jsx-runtime.js");
+      if (id === "react") return path.join(reactDir, "index.js");
+      if (id === "react-dom") return path.join(reactDomDir, "index.js");
+      if (id === "react/jsx-runtime") return path.join(reactDir, "jsx-runtime.js");
+      if (id === "react/jsx-dev-runtime") return path.join(reactDir, "jsx-dev-runtime.js");
       return null;
     },
   };
@@ -33,8 +35,9 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      react: reactPath,
-      "react-dom": reactDomPath,
+      // Pasta do pacote para que "react" e "react/jsx-runtime" resolvam corretamente
+      react: reactDir,
+      "react-dom": reactDomDir,
     },
     dedupe: ["react", "react-dom"],
   },
