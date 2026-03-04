@@ -133,20 +133,20 @@ function RelatoriosDemo() {
   const showLine = (isDragging && dragPos) || connected;
   const canDraw = showLine && lineStart && lineEnd;
 
-  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10";
+  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[13rem] lg:max-w-[13rem]";
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-x-hidden cursor-auto",
+        "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto",
         "min-h-[380px] sm:min-h-[450px]",
-        "flex flex-col items-center justify-center p-6 lg:p-0 lg:relative lg:h-[450px]"
+        "flex flex-col items-center justify-center p-6 lg:p-6 lg:relative lg:h-[420px]"
       )}
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" aria-hidden />
       {!connected && !isDragging && (
-        <p className="lg:absolute lg:bottom-4 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0">
+        <p className="lg:absolute lg:bottom-4 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0 max-w-xs">
           <span className="lg:hidden">Na plataforma, conecte blocos arrastando.</span>
           <span className="hidden lg:inline">Arraste do ponto roxo até o outro bloco para conectar</span>
         </p>
@@ -207,11 +207,8 @@ function RelatoriosDemo() {
           )}
         </div>
       </div>
-      {/* Desktop: layout original com drag-and-drop */}
-      <div className="hidden lg:block relative w-full h-full min-h-[450px]">
-        {!connected && !isDragging && (
-          <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20 px-4 text-center">Arraste do ponto roxo até o outro bloco para conectar</p>
-        )}
+      {/* Desktop: blocos lado a lado, bem visíveis */}
+      <div className="hidden lg:flex lg:items-center lg:justify-center lg:gap-8 lg:px-4 relative w-full h-full">
         {canDraw && (
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
             <path
@@ -224,10 +221,10 @@ function RelatoriosDemo() {
             />
           </svg>
         )}
-        <div className={cn("absolute top-6 sm:top-12 left-4 sm:left-10", cardCls)}>
+        <div className={cn("relative shrink-0", cardCls)}>
           <div className="flex items-center gap-3 mb-4">
             <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
-            <span className="font-semibold text-foreground text-sm sm:text-base truncate">Histórico do Paciente</span>
+            <span className="font-semibold text-foreground text-sm sm:text-base">Histórico do Paciente</span>
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-muted/60 rounded-full" />
@@ -243,7 +240,19 @@ function RelatoriosDemo() {
             aria-label="Arraste até o bloco Resumo com IA para conectar"
           />
         </div>
-        <div className={cn("absolute bottom-14 sm:bottom-16 right-4 sm:right-10", cardCls)}>
+        <div className="flex flex-col items-center justify-center gap-2 shrink-0 py-4">
+          <div className="w-1 h-8 bg-primary/30 rounded-full" aria-hidden />
+          {!connected ? (
+            <span className="text-xs text-muted-foreground">ou arraste a linha</span>
+          ) : (
+            <div className="flex items-center gap-1.5 text-primary">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-xs font-medium">Conectado</span>
+            </div>
+          )}
+          <div className="w-1 h-8 bg-primary/30 rounded-full" aria-hidden />
+        </div>
+        <div className={cn("relative shrink-0", cardCls)}>
           <div
             ref={targetDotRef}
             className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
