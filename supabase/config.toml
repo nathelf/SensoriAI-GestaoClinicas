@@ -2,3 +2,6 @@ project_id = "qdolsrosokpbclmtfjgh"
 
 [functions.lorena-chat]
 verify_jwt = false
+
+[functions.gerar-insight-relatorio]
+verify_jwt = true

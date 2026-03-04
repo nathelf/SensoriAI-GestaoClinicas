@@ -57,6 +57,7 @@ const SensoriAIChat = lazy(() => import("./pages/SensoriAIChat"));
 const SensoriAIAnalisador = lazy(() => import("./pages/SensoriAIAnalisador"));
 const SensoriAIConfig = lazy(() => import("./pages/SensoriAIConfig"));
 const AlertasRetorno = lazy(() => import("./pages/AlertasRetorno"));
+const RelatoriosPersonalizados = lazy(() => import("./pages/RelatoriosPersonalizados"));
 const Profissionais = lazy(() => import("./pages/contatos/Profissionais"));
 const Fornecedores = lazy(() => import("./pages/contatos/Fornecedores"));
 const Leads = lazy(() => import("./pages/contatos/Leads"));
@@ -138,6 +139,8 @@ const App = () => (
                 <Route path="/comissoes/tabela-vendas" element={<TabelaVendas />} />
                 <Route path="/comissoes/tabela-atendimento" element={<TabelaAtendimento />} />
                 <Route path="/comissoes/relatorio" element={<RelatorioComissoes />} />
+                {/* Relatórios Inteligentes */}
+                <Route path="/relatorios-ia" element={<RelatoriosPersonalizados />} />
                 {/* Contatos */}
                 <Route path="/contatos/profissionais" element={<Profissionais />} />
                 <Route path="/contatos/fornecedores" element={<Fornecedores />} />

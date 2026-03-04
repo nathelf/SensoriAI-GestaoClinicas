@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Home, Calendar, UserPlus, Users,
   ChevronDown, Stethoscope, DollarSign, Package,
-  Settings, MessageSquare, FileText, Menu, X, Shield
+  Settings, MessageSquare, FileText, Menu, X, Shield, Sparkles
 } from "lucide-react";
 import { SensoriAILogo } from "@/components/SensoriAILogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,6 +73,7 @@ const navSections: NavSection[] = [
     basePath: "/documentos",
     items: [
       { label: "Documentos e Termos", path: "/clinidocs" },
+      { label: "Relatórios Inteligentes", path: "/relatorios-ia" },
       { label: "Conversor de Documentos", path: "/documentos/conversor" },
       { label: "Comunicação", path: "/comunicacao" },
     ],

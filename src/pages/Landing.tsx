@@ -300,13 +300,13 @@ export default function Landing() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 pt-24 sm:pt-32">
+      <main className="relative z-10 flex-1 pt-24">
         {/* --- Hero Section --- */}
         <section
-          className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-visible"
+          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-0 sm:pt-4 lg:pt-6 px-4 sm:px-6 lg:px-8 overflow-visible"
           onMouseMove={handleMouseMove}
         >
-          
+
           {/* Blocos Flutuantes Premium (Efeito Glassmorphism 3D) */}
           <div className="absolute inset-0 pointer-events-none hidden lg:block z-0">
             <motion.div animate={floatAnimation1} className="absolute top-[20%] left-[10%] w-56 p-4 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center gap-4">
@@ -318,26 +318,26 @@ export default function Landing() {
             </motion.div>
 
             <motion.div animate={floatAnimation2} className="absolute top-[40%] right-[8%] w-64 p-5 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center gap-4">
-               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"><Activity className="w-6 h-6 text-primary" /></div>
-               <div className="flex-1">
-                 <div className="flex justify-between items-end mb-2">
-                   <div className="h-3 w-12 bg-primary/40 rounded-sm" />
-                   <div className="h-6 w-8 bg-primary/20 rounded-sm" />
-                 </div>
-                 <div className="flex justify-between items-end">
-                   <div className="h-3 w-16 bg-muted-foreground/20 rounded-sm" />
-                   <div className="h-8 w-8 bg-primary/60 rounded-sm" />
-                 </div>
-               </div>
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"><Activity className="w-6 h-6 text-primary" /></div>
+              <div className="flex-1">
+                <div className="flex justify-between items-end mb-2">
+                  <div className="h-3 w-12 bg-primary/40 rounded-sm" />
+                  <div className="h-6 w-8 bg-primary/20 rounded-sm" />
+                </div>
+                <div className="flex justify-between items-end">
+                  <div className="h-3 w-16 bg-muted-foreground/20 rounded-sm" />
+                  <div className="h-8 w-8 bg-primary/60 rounded-sm" />
+                </div>
+              </div>
             </motion.div>
 
             <motion.div animate={floatAnimation3} className="absolute bottom-[20%] left-[15%] w-48 p-4 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center gap-3">
-               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><Bot className="w-5 h-5 text-primary" /></div>
-               <div className="h-2.5 w-20 bg-primary/30 rounded-full" />
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><Bot className="w-5 h-5 text-primary" /></div>
+              <div className="h-2.5 w-20 bg-primary/30 rounded-full" />
             </motion.div>
           </div>
 
-          <div className="max-w-5xl mx-auto text-center relative z-10 mt-10">
+          <div className="max-w-5xl mx-auto text-center relative z-10 mt-2 sm:mt-4">
             {/* Banner */}
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, type: "spring" }} className="inline-flex items-center gap-2.5 rounded-full bg-foreground/10 dark:bg-foreground/5 border border-border/50 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-foreground mb-8 shadow-sm cursor-default">
               <span className="relative flex h-2 w-2">
@@ -346,7 +346,7 @@ export default function Landing() {
               </span>
               Plataforma personalizada para o seu fluxo de trabalho
             </motion.div>
-            
+
             {/* Título principal */}
             <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
               <motion.span variants={fadeUp} className="block">Sua clínica.</motion.span>
@@ -358,11 +358,11 @@ export default function Landing() {
               </motion.span>
               <motion.span variants={fadeUp} className="block mt-2">Seu futuro.</motion.span>
             </motion.h1>
-            
+
             <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
               Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">Arraste blocos, conecte dados</strong> e crie uma plataforma gerencial desenhada para o seu fluxo com IA nativa. <strong className="font-semibold text-foreground">Modelo customizado</strong> para o que sua clínica precisa.
             </motion.p>
-            
+
             <motion.div {...fadeUp} transition={{ delay: 0.3, duration: 0.8 }} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/auth" className="w-full sm:w-auto relative group inline-flex order-2 sm:order-1">
                 <motion.span
@@ -430,7 +430,7 @@ export default function Landing() {
               <p className="mt-4 text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
               className="relative rounded-[2rem] overflow-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-8 lg:p-12 shadow-2xl"
             >
@@ -542,16 +542,16 @@ export default function Landing() {
                   </div>
                 </motion.div>
               </div>
-              
+
               {/* Mockup Chat IA */}
               <div className="relative">
                 <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7 }} className="bg-white dark:bg-card rounded-[2rem] shadow-2xl border border-border overflow-hidden">
-                  
+
                   {/* Header do Chat IA */}
                   <div className="bg-muted/30 px-6 py-4 border-b border-border flex items-center justify-between relative z-20">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-inner overflow-hidden">
-                         <SensoriAILogo variant="icon" iconClassName="w-6 h-6" noTextFallback />
+                        <SensoriAILogo variant="icon" iconClassName="w-6 h-6" noTextFallback />
                       </div>
                       <div>
                         <div className="font-bold text-sm">SensoriAI - Assistente Virtual</div>
@@ -572,34 +572,34 @@ export default function Landing() {
 
                   {/* Corpo do Chat Animado */}
                   <div className="p-6 flex flex-col gap-4 bg-[#F8F9FB] dark:bg-background/50 h-[300px] overflow-hidden relative z-10">
-                    
+
                     {/* Mensagem 1 (Usuário) */}
                     <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.5 }} className="self-end bg-foreground text-background px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm shadow-md origin-bottom-right">
                       Preciso gerar um relatório de faturamento do mês passado agrupado por convênio, como eu faço?
                     </motion.div>
-                    
+
                     {/* Indicador de Digitação IA (Rápido) */}
                     <motion.div initial={{ opacity: 0, y: 10, display: "none" }} whileInView={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -10], display: ["flex", "flex", "flex", "none"] }} viewport={{ once: true }} transition={{ duration: 1.5, times: [0, 0.1, 0.9, 1], delay: 1 }} className="self-start bg-white dark:bg-card border border-border px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm gap-1.5 items-center h-[42px] origin-bottom-left">
                       <motion.div className="w-1.5 h-1.5 bg-primary rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.4, delay: 0 }} />
                       <motion.div className="w-1.5 h-1.5 bg-primary rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.4, delay: 0.1 }} />
                       <motion.div className="w-1.5 h-1.5 bg-primary rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.4, delay: 0.2 }} />
                     </motion.div>
-                    
+
                     {/* Mensagem 2 (Resposta IA) */}
                     <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 2.5 }} className="self-start bg-white dark:bg-card border border-primary/20 px-4 py-3 rounded-2xl rounded-tl-sm max-w-[85%] text-sm shadow-sm flex flex-col gap-2 origin-bottom-left">
-                       <div className="flex items-center gap-2 mb-1">
-                         <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                           <SensoriAILogo variant="icon" iconClassName="w-4 h-4" noTextFallback />
-                         </div>
-                         <span className="font-semibold text-primary text-xs uppercase tracking-wide">Ação pronta</span>
-                       </div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                          <SensoriAILogo variant="icon" iconClassName="w-4 h-4" noTextFallback />
+                        </div>
+                        <span className="font-semibold text-primary text-xs uppercase tracking-wide">Ação pronta</span>
+                      </div>
                       <p className="text-foreground leading-relaxed">
                         {assistantChoice === null && "Eu montei o modelo para você! Arraste o bloco "}
                         {assistantChoice === null && <><strong>"Faturamento Consolidado"</strong> para a tela e conecte com o bloco <strong>"Filtro por Convênio"</strong>. Quer que eu salve esse template na sua galeria?</>}
                         {assistantChoice === "saved" && "Template salvo na sua galeria! Em Relatórios você encontra esse modelo pronto para usar quando quiser."}
                         {assistantChoice === "declined" && "Sem problemas. O modelo continua disponível para você montar o relatório quando quiser."}
                       </p>
-                      
+
                       {assistantChoice === null ? (
                         <div className="flex gap-2 mt-2">
                           <button
@@ -626,7 +626,7 @@ export default function Landing() {
                     </motion.div>
                   </div>
                 </motion.div>
-                
+
                 {/* Efeito luminoso radial de fundo */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary/20 to-purple-500/10 blur-[80px] -z-10 rounded-full opacity-70 pointer-events-none" />
               </div>
