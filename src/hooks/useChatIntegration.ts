@@ -20,7 +20,7 @@ export function setIntegrationConfig(url: string, notifyOnOpen: boolean) {
 }
 
 /**
- * Dispara a integração quando o usuário abre a conversa com a Anna.
+ * Dispara a integração quando o usuário abre a conversa com a Lorena.
  * Útil para conectar chatbot externo ou call center ao sistema.
  */
 export function useChatIntegration() {

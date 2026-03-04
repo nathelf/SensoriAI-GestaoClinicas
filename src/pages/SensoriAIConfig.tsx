@@ -56,7 +56,7 @@ export default function SensoriAIConfig() {
               <h3 className="font-semibold text-sm text-foreground">Integração com Chatbot ou Call Center</h3>
             </div>
             <p className="text-xs text-muted-foreground">
-              Ao abrir a conversa com a Anna (widget ou página IA), o sistema pode notificar uma URL de sua escolha. Use para conectar seu chatbot, central de atendimento ou CRM.
+              Ao abrir a conversa com a Lorena (widget ou página IA), o sistema pode notificar uma URL de sua escolha. Use para conectar seu chatbot, central de atendimento ou CRM.
             </p>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">URL de integração (webhook)</label>

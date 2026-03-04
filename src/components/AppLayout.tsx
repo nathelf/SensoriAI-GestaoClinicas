@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { BottomTabBar } from "./BottomTabBar";
-import { AnnaChat } from "./AnnaChat";
+import { LorenaChat } from "./LorenaChat";
 import { Menu, MessageCircle, LogOut, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -96,8 +96,8 @@ export function AppLayout() {
         <MessageCircle className="w-6 h-6" />
       </a>
 
-      {/* Anna AI Chat */}
-      <AnnaChat />
+      {/* Lorena AI Chat */}
+      <LorenaChat />
     </div>
   );
 }

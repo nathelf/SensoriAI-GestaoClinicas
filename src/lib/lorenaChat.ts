@@ -4,9 +4,9 @@ export type ChatMessage = { role: "user" | "assistant"; content: string };
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-const CHAT_URL = `${SUPABASE_URL}/functions/v1/anna-chat`;
+const CHAT_URL = `${SUPABASE_URL}/functions/v1/lorena-chat`;
 
-export async function streamAnnaChat({
+export async function streamLorenaChat({
   messages,
   onDelta,
   onDone,
@@ -34,7 +34,7 @@ export async function streamAnnaChat({
 
     if (!resp.ok) {
       const t = await resp.text().catch(() => "");
-      throw new Error(`AnnaChat error (${resp.status}): ${t}`);
+      throw new Error(`LorenaChat error (${resp.status}): ${t}`);
     }
 
     const { reply } = await resp.json();

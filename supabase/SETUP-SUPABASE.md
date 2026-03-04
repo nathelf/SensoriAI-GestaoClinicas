@@ -80,11 +80,11 @@ ALTER TABLE public.clinic_documents ADD COLUMN IF NOT EXISTS is_template BOOLEAN
 
 ---
 
-## 4. Chat da Anna (Edge Function)
+## 4. Chat da Lorena (Edge Function)
 
 Para o chat usar IA:
 
-1. **Edge Functions** → **anna-chat** → **Secrets**  
+1. **Edge Functions** → **lorena-chat** → **Secrets**  
 2. Crie o secret **OPENAI_API_KEY** com sua chave de uma API compatível com OpenAI (OpenAI, Together, Groq, etc.)  
 3. Opcional: **OPENAI_API_BASE** (URL base) e **CHAT_MODEL** (modelo)
 

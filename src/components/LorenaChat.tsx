@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Send, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { streamAnnaChat } from "@/lib/annaChat";
+import { streamLorenaChat } from "@/lib/lorenaChat";
 import { useChatIntegration } from "@/hooks/useChatIntegration";
-import type { ChatMessage } from "@/lib/annaChat";
+import type { ChatMessage } from "@/lib/lorenaChat";
 
 type Msg = ChatMessage;
 
-export function AnnaChat() {
+export function LorenaChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -39,7 +39,7 @@ export function AnnaChat() {
       // envia só as últimas 10 mensagens + a atual
       const toSend = [...messages, userMsg].slice(-10);
 
-      await streamAnnaChat({
+      await streamLorenaChat({
         messages: toSend,
         onDelta: (fullText) => {
           // ✅ adiciona a resposta como uma nova mensagem (sem "stream/upsert")
@@ -50,7 +50,7 @@ export function AnnaChat() {
     } catch (e) {
       console.error(e);
       setLoading(false);
-      toast.error("Erro ao conectar com a Anna");
+      toast.error("Erro ao conectar com a Lorena");
     }
   };
 
@@ -79,7 +79,7 @@ export function AnnaChat() {
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-bold text-sm text-foreground">Anna</p>
+                <p className="font-bold text-sm text-foreground">Lorena</p>
                 <p className="text-xs text-muted-foreground">Assistente SensoriAI</p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export function AnnaChat() {
               {messages.length === 0 && (
                 <div className="text-center text-sm text-muted-foreground py-8">
                   <Sparkles className="w-8 h-8 text-primary mx-auto mb-2 opacity-50" />
-                  <p>Olá! Sou a Anna 👋</p>
+                  <p>Olá! Sou a Lorena 👋</p>
                   <p className="mt-1">Como posso ajudar você hoje?</p>
                 </div>
               )}
@@ -132,7 +132,7 @@ export function AnnaChat() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
-                  placeholder="Pergunte algo à Anna..."
+                  placeholder="Pergunte algo à Lorena..."
                   className="flex-1 px-3.5 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 outline-none"
                 />
                 <button

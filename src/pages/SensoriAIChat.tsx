@@ -3,9 +3,9 @@ import { Send, Bot, Sparkles, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { streamAnnaChat } from "@/lib/annaChat";
+import { streamLorenaChat } from "@/lib/lorenaChat";
 import { useChatIntegration } from "@/hooks/useChatIntegration";
-import type { ChatMessage } from "@/lib/annaChat";
+import type { ChatMessage } from "@/lib/lorenaChat";
 
 export default function SensoriAIChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -46,7 +46,7 @@ export default function SensoriAIChat() {
     };
 
     try {
-      const result = await streamAnnaChat({
+      const result = await streamLorenaChat({
         messages: [...messages, userMsg],
         onDelta: upsert,
         onDone: () => setLoading(false),
@@ -56,7 +56,7 @@ export default function SensoriAIChat() {
     } catch (e) {
       console.error(e);
       setLoading(false);
-      toast.error("Erro ao conectar com a Anna");
+      toast.error("Erro ao conectar com a Lorena");
     }
   };
 
@@ -64,14 +64,14 @@ export default function SensoriAIChat() {
     <div className="flex flex-col h-[calc(100vh-120px)] max-w-3xl mx-auto">
       <div className="p-4 lg:p-6 pb-2">
         <h1 className="text-xl font-bold text-foreground">Assistente SensoriAI</h1>
-        <p className="text-sm text-muted-foreground">Converse com a Anna. Ao abrir esta tela, seu chatbot ou central de atendimento pode ser notificado (configurar em Config. IA).</p>
+        <p className="text-sm text-muted-foreground">Converse com a Lorena. Ao abrir esta tela, seu chatbot ou central de atendimento pode ser notificado (configurar em Config. IA).</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 lg:px-6 space-y-3 pb-4">
         {messages.length === 0 && (
           <div className="text-center text-sm text-muted-foreground py-8">
             <Sparkles className="w-8 h-8 text-primary mx-auto mb-2 opacity-50" />
-            <p>Olá! Sou a Anna 👋</p>
+            <p>Olá! Sou a Lorena 👋</p>
             <p className="mt-1">Como posso ajudar sua clínica hoje?</p>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function SensoriAIChat() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && send()}
-            placeholder="Pergunte algo à Anna..."
+            placeholder="Pergunte algo à Lorena..."
             className="flex-1 px-4 py-3 bg-card border border-border/60 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
           />
           <button onClick={send} disabled={loading || !input.trim()} className="p-3 bg-primary text-primary-foreground rounded-2xl hover:opacity-90 disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center">

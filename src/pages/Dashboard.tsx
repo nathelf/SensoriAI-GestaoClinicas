@@ -338,7 +338,7 @@ export default function Dashboard() {
                 WhatsApp
               </button>
               <button className="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-primary to-pastel-rose text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
-                Pedir à Anna
+                Pedir à Lorena
               </button>
             </div>
           </div>

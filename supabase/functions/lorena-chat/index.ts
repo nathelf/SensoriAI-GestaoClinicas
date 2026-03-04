@@ -33,7 +33,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const messages: Msg[] = Array.isArray(body?.messages) ? body.messages : [];
 
-    const system = `Você é a Anna, assistente virtual inteligente da SensoriAI — uma plataforma SaaS para clínicas de estética.
+    const system = `Você é a Lorena, assistente virtual inteligente da SensoriAI — uma plataforma SaaS para clínicas de estética.
 
 Personalidade:
 - Simpática, profissional e empática
@@ -84,7 +84,7 @@ Regras:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("anna-chat error:", e);
+    console.error("lorena-chat error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
