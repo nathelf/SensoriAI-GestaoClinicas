@@ -64,6 +64,7 @@ const DROP_RADIUS_PX = 56;
 
 function RelatoriosDemo() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const desktopBoardRef = useRef<HTMLDivElement>(null);
   const sourceDotRef = useRef<HTMLDivElement>(null);
   const targetDotRef = useRef<HTMLDivElement>(null);
   const [connected, setConnected] = useState(false);
@@ -78,28 +79,37 @@ function RelatoriosDemo() {
     return { x: er.left - cr.left + er.width / 2, y: er.top - cr.top + er.height / 2 };
   }, []);
 
+  /** Posições relativas ao board desktop (para a linha SVG que está dentro dele) */
+  const getPosInBoard = useCallback((el: HTMLElement | null) => {
+    if (!el || !desktopBoardRef.current) return null;
+    const br = desktopBoardRef.current.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    return { x: er.left - br.left + er.width / 2, y: er.top - br.top + er.height / 2 };
+  }, []);
+
   const startDrag = useCallback(() => {
-    const pos = getPosInContainer(sourceDotRef.current);
+    const pos = getPosInBoard(sourceDotRef.current) ?? getPosInContainer(sourceDotRef.current);
     if (pos) {
       setIsDragging(true);
       setDragPos(pos);
       posRef.current = pos;
     }
-  }, [getPosInContainer]);
+  }, [getPosInBoard, getPosInContainer]);
 
   useEffect(() => {
     if (!isDragging) return;
     const target = targetDotRef.current;
-    const targetCenter = target ? getPosInContainer(target) : null;
+    const board = desktopBoardRef.current;
+    const targetCenter = target && board ? getPosInBoard(target) : null;
 
-    const getXY = (clientX: number, clientY: number) => {
-      if (!containerRef.current) return null;
-      const r = containerRef.current.getBoundingClientRect();
+    const getXYInBoard = (clientX: number, clientY: number) => {
+      if (!board) return null;
+      const r = board.getBoundingClientRect();
       return { x: clientX - r.left, y: clientY - r.top };
     };
 
     const onMove = (e: MouseEvent) => {
-      const xy = getXY(e.clientX, e.clientY);
+      const xy = getXYInBoard(e.clientX, e.clientY);
       if (!xy) return;
       if (targetCenter) {
         const dist = Math.hypot(xy.x - targetCenter.x, xy.y - targetCenter.y);
@@ -125,43 +135,33 @@ function RelatoriosDemo() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
     };
-  }, [isDragging, getPosInContainer]);
+  }, [isDragging, getPosInBoard]);
 
-  const lineStart = getPosInContainer(sourceDotRef.current);
-  const targetCenter = getPosInContainer(targetDotRef.current);
+  const lineStart = getPosInBoard(sourceDotRef.current) ?? getPosInContainer(sourceDotRef.current);
+  const targetCenter = getPosInBoard(targetDotRef.current) ?? getPosInContainer(targetDotRef.current);
   const lineEnd = connected ? targetCenter : dragPos;
   const showLine = (isDragging && dragPos) || connected;
   const canDraw = showLine && lineStart && lineEnd;
 
-  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[14rem] lg:max-w-[14rem]";
+  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10";
+  const desktopBlockCls = "bg-white dark:bg-card rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-2 border-border/80 p-5 z-10 flex-shrink-0 w-[13rem]";
+  const connectionDotCls = "w-5 h-5 rounded-full bg-purple-500 border-2 border-white shadow-[0_0_8px_rgba(168,85,247,0.5)] ring-2 ring-purple-500/40";
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto",
-        "min-h-[380px] sm:min-h-[450px]",
-        "flex flex-col items-center justify-center p-6 lg:p-6 xl:p-8 lg:relative lg:h-[420px] xl:h-[480px] 2xl:h-[520px]"
+        "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-visible cursor-auto",
+        "min-h-[380px] sm:min-h-[450px] lg:min-h-[480px]",
+        "flex flex-col items-center justify-center p-6 lg:p-8 lg:relative lg:h-[480px] lg:min-w-[34rem]"
       )}
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" aria-hidden />
       {!connected && !isDragging && (
-        <p className="lg:absolute lg:bottom-4 xl:bottom-6 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm xl:text-base text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0 max-w-xs xl:max-w-sm">
+        <p className="lg:absolute lg:bottom-4 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0">
           <span className="lg:hidden">Na plataforma, conecte blocos arrastando.</span>
           <span className="hidden lg:inline">Arraste do ponto roxo até o outro bloco para conectar</span>
         </p>
-      )}
-      {canDraw && (
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" style={{ overflow: "visible" }} aria-hidden>
-          <path
-            d={`M ${lineStart.x} ${lineStart.y} C ${lineStart.x + 60} ${lineStart.y}, ${lineEnd.x - 60} ${lineEnd.y}, ${lineEnd.x} ${lineEnd.y}`}
-            stroke="#a855f7"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={connected ? "0" : "6 6"}
-          />
-        </svg>
       )}
       {/* Mobile: blocos em coluna */}
       <div className="flex flex-col items-center gap-0 w-full max-w-[20rem] mx-auto lg:hidden">
@@ -207,25 +207,26 @@ function RelatoriosDemo() {
           )}
         </div>
       </div>
-      {/* Desktop: posição absoluta — bloco 1 top-left, bloco 2 bottom-right (ambos sempre visíveis) */}
-      <div className="hidden lg:block relative w-full h-full min-h-[400px]">
+      {/* Desktop: board com blocos, pontos de conexão e linhas — simulação clara */}
+      <div ref={desktopBoardRef} className="hidden lg:flex lg:items-center lg:justify-center lg:gap-10 relative w-full h-full min-h-[420px]">
+        {/* Linha de conexão (SVG) */}
         {canDraw && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1]" style={{ overflow: "visible" }}>
             <path
               d={`M ${lineStart.x} ${lineStart.y} C ${lineStart.x + 60} ${lineStart.y}, ${lineEnd.x - 60} ${lineEnd.y}, ${lineEnd.x} ${lineEnd.y}`}
               stroke="#a855f7"
               strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
-              strokeDasharray={connected ? "0" : "6 6"}
+              strokeDasharray={connected ? "0" : "8 6"}
             />
           </svg>
         )}
-        {/* Bloco 1: Histórico do Paciente — canto superior esquerdo */}
-        <div className={cn("absolute top-6 left-6 xl:top-8 xl:left-8", cardCls)}>
+        {/* Bloco 1: Histórico do Paciente */}
+        <div className={cn("relative", desktopBlockCls)}>
           <div className="flex items-center gap-3 mb-4">
             <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
-            <span className="font-semibold text-foreground text-sm sm:text-base">Histórico do Paciente</span>
+            <span className="font-semibold text-foreground text-sm">Histórico do Paciente</span>
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-muted/60 rounded-full" />
@@ -237,15 +238,30 @@ function RelatoriosDemo() {
             tabIndex={0}
             onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
-            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
-            aria-label="Arraste até o bloco Resumo com IA para conectar"
+            className={cn("absolute top-1/2 -right-3 -translate-y-1/2 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform", connectionDotCls)}
+            aria-label="Ponto de conexão — arraste até o outro bloco"
+            title="Arraste até o bloco SensoriAI"
           />
         </div>
-        {/* Bloco 2: SensoriAI — canto inferior direito */}
-        <div className={cn("absolute bottom-20 right-6 xl:bottom-24 xl:right-8", cardCls)}>
+        {/* Área entre blocos — indica fluxo */}
+        <div className="flex flex-col items-center gap-1 shrink-0 z-10">
+          {connected ? (
+            <>
+              <div className="flex items-center gap-2 text-primary font-medium">
+                <div className="w-3 h-3 rounded-full bg-primary animate-pulse ring-2 ring-primary/40" />
+                <span className="text-sm">Conectado</span>
+              </div>
+              <p className="text-xs text-muted-foreground text-center max-w-[10rem]">Assim você liga os blocos na plataforma.</p>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground text-center">Arraste o ponto roxo</span>
+          )}
+        </div>
+        {/* Bloco 2: SensoriAI */}
+        <div className={cn("relative", desktopBlockCls)}>
           <div
             ref={targetDotRef}
-            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
+            className={cn("absolute top-1/2 -left-3 -translate-y-1/2 pointer-events-none", connectionDotCls)}
             aria-hidden
           />
           <div className="flex items-center gap-3 mb-4">
@@ -257,7 +273,7 @@ function RelatoriosDemo() {
             <div className="h-2 w-1/2 bg-purple-100 dark:bg-purple-900/30 rounded-full" />
           </div>
           {connected && (
-            <p className="mt-3 text-xs sm:text-sm text-primary font-medium leading-snug">Conectado. É assim que você liga os blocos na plataforma.</p>
+            <p className="mt-3 text-xs text-primary font-medium">Resumo com IA</p>
           )}
         </div>
       </div>
@@ -508,7 +524,7 @@ export default function Landing() {
 
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
-              className="relative rounded-2xl sm:rounded-[2rem] overflow-x-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-6 sm:p-8 lg:p-12 xl:p-14 2xl:p-16 shadow-2xl"
+              className="relative rounded-2xl sm:rounded-[2rem] overflow-visible border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-6 sm:p-8 lg:p-12 xl:p-14 2xl:p-16 shadow-2xl"
             >
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 2xl:gap-20 items-center relative z-10">
                 <div className="lg:col-span-2 space-y-6 lg:space-y-8 xl:space-y-10 order-2 lg:order-1">
@@ -534,7 +550,7 @@ export default function Landing() {
                     ))}
                   </ul>
                 </div>
-                <div className="order-1 lg:order-2 min-w-0">
+                <div className="order-1 lg:order-2 min-w-0 lg:min-w-[36rem] xl:min-w-[40rem]">
                   <RelatoriosDemo />
                 </div>
               </div>
