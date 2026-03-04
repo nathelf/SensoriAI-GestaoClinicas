@@ -133,7 +133,7 @@ function RelatoriosDemo() {
   const showLine = (isDragging && dragPos) || connected;
   const canDraw = showLine && lineStart && lineEnd;
 
-  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[13rem] lg:max-w-[13rem]";
+  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[13rem] lg:max-w-[13rem] xl:w-[15rem] xl:max-w-[15rem] xl:p-5 2xl:w-[17rem] 2xl:max-w-[17rem] 2xl:p-6";
 
   return (
     <div
@@ -141,12 +141,12 @@ function RelatoriosDemo() {
       className={cn(
         "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto",
         "min-h-[380px] sm:min-h-[450px]",
-        "flex flex-col items-center justify-center p-6 lg:p-6 lg:relative lg:h-[420px]"
+        "flex flex-col items-center justify-center p-6 lg:p-6 xl:p-8 lg:relative lg:h-[420px] xl:h-[480px] 2xl:h-[520px]"
       )}
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" aria-hidden />
       {!connected && !isDragging && (
-        <p className="lg:absolute lg:bottom-4 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0 max-w-xs">
+        <p className="lg:absolute lg:bottom-4 xl:bottom-6 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm xl:text-base text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0 max-w-xs xl:max-w-sm">
           <span className="lg:hidden">Na plataforma, conecte blocos arrastando.</span>
           <span className="hidden lg:inline">Arraste do ponto roxo até o outro bloco para conectar</span>
         </p>
@@ -207,8 +207,8 @@ function RelatoriosDemo() {
           )}
         </div>
       </div>
-      {/* Desktop: blocos lado a lado, bem visíveis */}
-      <div className="hidden lg:flex lg:items-center lg:justify-center lg:gap-8 lg:px-4 relative w-full h-full">
+      {/* Desktop: blocos lado a lado, bem visíveis e escaláveis */}
+      <div className="hidden lg:flex lg:items-center lg:justify-center lg:gap-8 xl:gap-12 2xl:gap-16 lg:px-4 xl:px-6 relative w-full h-full">
         {canDraw && (
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
             <path
@@ -222,9 +222,9 @@ function RelatoriosDemo() {
           </svg>
         )}
         <div className={cn("relative shrink-0", cardCls)}>
-          <div className="flex items-center gap-3 mb-4">
-            <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
-            <span className="font-semibold text-foreground text-sm sm:text-base">Histórico do Paciente</span>
+          <div className="flex items-center gap-3 mb-4 xl:mb-5">
+            <Stethoscope className="w-5 h-5 xl:w-6 xl:h-6 text-purple-600 shrink-0" />
+            <span className="font-semibold text-foreground text-sm sm:text-base xl:text-lg">Histórico do Paciente</span>
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-muted/60 rounded-full" />
@@ -236,30 +236,30 @@ function RelatoriosDemo() {
             tabIndex={0}
             onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
-            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
+            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
             aria-label="Arraste até o bloco Resumo com IA para conectar"
           />
         </div>
-        <div className="flex flex-col items-center justify-center gap-2 shrink-0 py-4">
-          <div className="w-1 h-8 bg-primary/30 rounded-full" aria-hidden />
+        <div className="flex flex-col items-center justify-center gap-2 shrink-0 py-4 xl:py-6">
+          <div className="w-1 h-8 xl:h-10 bg-primary/30 rounded-full" aria-hidden />
           {!connected ? (
-            <span className="text-xs text-muted-foreground">ou arraste a linha</span>
+            <span className="text-xs xl:text-sm text-muted-foreground">ou arraste a linha</span>
           ) : (
-            <div className="flex items-center gap-1.5 text-primary">
-              <div className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-xs font-medium">Conectado</span>
+            <div className="flex items-center gap-1.5 xl:gap-2 text-primary">
+              <div className="w-2 h-2 xl:w-2.5 xl:h-2.5 rounded-full bg-primary" />
+              <span className="text-xs xl:text-sm font-medium">Conectado</span>
             </div>
           )}
-          <div className="w-1 h-8 bg-primary/30 rounded-full" aria-hidden />
+          <div className="w-1 h-8 xl:h-10 bg-primary/30 rounded-full" aria-hidden />
         </div>
         <div className={cn("relative shrink-0", cardCls)}>
           <div
             ref={targetDotRef}
-            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
+            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
             aria-hidden
           />
-          <div className="flex items-center gap-3 mb-4">
-            <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
+          <div className="flex items-center gap-3 mb-4 xl:mb-5">
+            <SensoriAILogo variant="icon" iconClassName="w-5 h-5 xl:w-6 xl:h-6" noTextFallback />
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
@@ -362,7 +362,7 @@ export default function Landing() {
         "fixed top-0 w-full z-50 transition-all duration-500 border-b",
         scrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-sm py-3" : "bg-transparent border-transparent py-5"
       )}>
-        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 flex items-center justify-between gap-3 min-w-0">
+        <div className="max-w-7xl xl:max-w-[85rem] 2xl:max-w-[95rem] mx-auto px-6 sm:px-6 lg:px-8 xl:px-10 flex items-center justify-between gap-3 min-w-0">
           <Link to="/" className="flex items-center gap-2.5 group shrink-0" aria-label="SensoriAI - Voltar à página inicial">
             <SensoriAILogo variant="full" iconClassName="w-8 h-8 sm:w-10 sm:h-10" className="group-hover:opacity-90 transition-opacity" />
           </Link>
@@ -509,37 +509,37 @@ export default function Landing() {
         </section>
 
         {/* --- Destaque: Relatórios Drag & Drop --- */}
-        <section id="relatorios" className="py-32 relative overflow-x-hidden">
-          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
-            <div className="text-center mb-10 sm:mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
-              <p className="mt-4 text-base sm:text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
+        <section id="relatorios" className="py-20 sm:py-28 lg:py-32 xl:py-40 relative overflow-x-hidden">
+          <div className="w-full max-w-7xl xl:max-w-[85rem] 2xl:max-w-[95rem] mx-auto px-6 sm:px-8 lg:px-10 xl:px-12">
+            <div className="text-center mb-10 sm:mb-14 lg:mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
+              <p className="mt-4 text-base sm:text-lg lg:text-xl xl:text-2xl text-muted-foreground max-w-2xl mx-auto">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
             </div>
 
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
-              className="relative rounded-2xl sm:rounded-[2rem] overflow-x-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-6 sm:p-8 lg:p-12 shadow-2xl"
+              className="relative rounded-2xl sm:rounded-[2rem] overflow-x-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-6 sm:p-8 lg:p-12 xl:p-14 2xl:p-16 shadow-2xl"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center relative z-10">
-                <div className="lg:col-span-2 space-y-6 lg:space-y-8 order-2 lg:order-1">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
-                    <Workflow className="w-7 h-7" />
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 2xl:gap-20 items-center relative z-10">
+                <div className="lg:col-span-2 space-y-6 lg:space-y-8 xl:space-y-10 order-2 lg:order-1">
+                  <div className="inline-flex items-center justify-center w-14 h-14 xl:w-16 xl:h-16 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
+                    <Workflow className="w-7 h-7 xl:w-8 xl:h-8" />
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+                  <h3 className="text-2xl sm:text-3xl xl:text-4xl font-bold text-foreground leading-tight">
                     Conecte blocos e deixe a IA gerar o relatório.
                   </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
-                  <ul className="space-y-6 sm:space-y-7">
+                  <p className="text-sm sm:text-base xl:text-lg text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
+                  <ul className="space-y-6 sm:space-y-7 xl:space-y-8">
                     {[
                       "Vincule Histórico do Paciente à nossa IA para enriquecer relatórios.",
                       "Resumos narrativos em PDF em um clique.",
                       "Templates reutilizáveis para toda a equipe.",
                     ].map((text, i) => (
-                      <li key={i} className="flex items-start gap-4">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <Check className="w-4 h-4 text-primary" />
+                      <li key={i} className="flex items-start gap-4 xl:gap-5">
+                        <div className="w-7 h-7 xl:w-8 xl:h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 xl:w-5 xl:h-5 text-primary" />
                         </div>
-                        <span className="text-base sm:text-lg text-foreground/80 font-medium leading-snug">{text}</span>
+                        <span className="text-base sm:text-lg xl:text-xl text-foreground/80 font-medium leading-snug">{text}</span>
                       </li>
                     ))}
                   </ul>
@@ -553,8 +553,8 @@ export default function Landing() {
         </section>
 
         {/* --- Recursos / O que sua clínica ganha --- */}
-        <section id="plataforma" className="py-24 bg-background overflow-x-hidden">
-          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+        <section id="plataforma" className="py-24 xl:py-32 bg-background overflow-x-hidden">
+          <div className="w-full max-w-7xl xl:max-w-[85rem] 2xl:max-w-[95rem] mx-auto px-6 sm:px-6 lg:px-8 xl:px-10">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-foreground tracking-tight">
                 O que sua clínica ganha na prática
@@ -600,8 +600,8 @@ export default function Landing() {
         </section>
 
         {/* --- SEÇÃO SUPORTE (Focado em IA Humanizada) --- */}
-        <section id="suporte" className="py-32 bg-primary/5 border-y border-border/50 relative overflow-x-hidden">
-          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 relative z-10">
+        <section id="suporte" className="py-32 xl:py-40 bg-primary/5 border-y border-border/50 relative overflow-x-hidden">
+          <div className="w-full max-w-7xl xl:max-w-[85rem] 2xl:max-w-[95rem] mx-auto px-6 sm:px-6 lg:px-8 xl:px-10 relative z-10">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
                 <motion.div initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", bounce: 0.5 }} className="inline-flex w-16 h-16 rounded-full bg-white dark:bg-card shadow-md items-center justify-center mb-8 p-2">
