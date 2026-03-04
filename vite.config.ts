@@ -2,6 +2,24 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
+const projectRoot = path.resolve(__dirname);
+const reactPath = path.join(projectRoot, "node_modules/react/index.js");
+const reactDomPath = path.join(projectRoot, "node_modules/react-dom/index.js");
+
+/** Plugin que força qualquer import de "react" ou "react-dom" a usar a cópia do projeto (corrige forwardRef undefined no lucide-react). */
+function forceReactResolution() {
+  return {
+    name: "force-react-resolution",
+    enforce: "pre",
+    resolveId(id: string) {
+      if (id === "react") return reactPath;
+      if (id === "react-dom") return reactDomPath;
+      if (id === "react/jsx-runtime") return path.join(projectRoot, "node_modules/react/jsx-runtime.js");
+      return null;
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
   server: {
@@ -11,19 +29,17 @@ export default defineConfig(() => ({
       overlay: false,
     },
   },
-  plugins: [react()],
+  plugins: [forceReactResolution(), react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Garante que lucide-react e outros pacotes usem a mesma instância de React (evita forwardRef undefined)
-      react: path.resolve(__dirname, "node_modules/react"),
-      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      react: reactPath,
+      "react-dom": reactDomPath,
     },
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
     include: ["react", "react-dom"],
-    // lucide-react fora do pré-bundle para usar o mesmo React da app (evita forwardRef undefined)
     exclude: ["lucide-react"],
   },
   build: {
