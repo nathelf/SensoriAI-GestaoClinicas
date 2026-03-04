@@ -15,6 +15,7 @@ interface NavSection {
   basePath: string;
   items: { label: string; path: string }[];
   useLogo?: boolean;
+  requiredModule?: string;
 }
 
 const navSections: NavSection[] = [
@@ -26,6 +27,7 @@ const navSections: NavSection[] = [
       { label: "Visão Geral", path: "/" },
       { label: "Alertas de Retorno", path: "/alertas-retorno" },
     ],
+    requiredModule: "dashboard"
   },
   {
     title: "Atendimento",
@@ -36,6 +38,7 @@ const navSections: NavSection[] = [
       { label: "Histórico Clínico", path: "/historico" },
       { label: "Galeria de Evolução", path: "/galeria" },
     ],
+    requiredModule: "prontuarios"
   },
   {
     title: "Agenda",
@@ -46,6 +49,7 @@ const navSections: NavSection[] = [
       { label: "Bloqueios de Horário", path: "/agenda/bloqueios" },
       { label: "Links de Agendamento", path: "/agenda/links" },
     ],
+    requiredModule: "agenda"
   },
   {
     title: "Contatos",
@@ -92,6 +96,7 @@ const navSections: NavSection[] = [
       { label: "Integração maquininha", path: "/financeiro/maquininha" },
       { label: "Vendas & Pacotes", path: "/vendas" },
     ],
+    requiredModule: "financeiro"
   },
   {
     title: "Comissões",
@@ -105,6 +110,7 @@ const navSections: NavSection[] = [
       { label: "Tabela de comissões de atendimento", path: "/comissoes/tabela-atendimento" },
       { label: "Relatório de comissões", path: "/comissoes/relatorio" },
     ],
+    requiredModule: "financeiro"
   },
   {
     title: "Estoque",
@@ -114,6 +120,7 @@ const navSections: NavSection[] = [
       { label: "Inventário", path: "/estoque" },
       { label: "Pedidos", path: "/estoque/pedidos" },
     ],
+    requiredModule: "estoque"
   },
   {
     title: "SensoriAI Lab",
@@ -133,6 +140,7 @@ const navSections: NavSection[] = [
     items: [
       { label: "Preferências do sistema", path: "/configuracoes" },
       { label: "Dados da clínica", path: "/configuracoes/clinica" },
+      { label: "Config. de Administrador", path: "/config-clinica" },
       { label: "Assinatura", path: "/configuracoes/assinatura" },
       { label: "Procedimentos", path: "/configuracoes/procedimentos" },
       { label: "Categorias de procedimentos", path: "/configuracoes/categorias-procedimentos" },
@@ -143,6 +151,7 @@ const navSections: NavSection[] = [
       { label: "Etiquetas", path: "/configuracoes/etiquetas" },
       { label: "Horários de funcionamento", path: "/configuracoes/horarios" },
     ],
+    requiredModule: "configuracoes"
   },
 ];
 
@@ -153,11 +162,37 @@ interface SidebarProps {
 
 export function AppSidebar({ open, onClose }: SidebarProps) {
   const location = useLocation();
-  const { userRole } = useAuth();
-  
-  const sections = userRole === "admin" 
-    ? [navSections[0], { title: "Admin", icon: Shield, basePath: "/admin", items: [{ label: "Painel Administrativo", path: "/admin" }] }, ...navSections.slice(1)]
-    : navSections;
+  const { userRole, modulos } = useAuth();
+
+  // Filtra as secões baseado no RBAC de modulos carregado no useAuth
+  const filteredNavSections = navSections.filter(section => {
+    if (!section.requiredModule) return true; // Contatos, Documentos, SensoriAI liberados por padrao ou tratado no proprio crud
+    return modulos[section.requiredModule] === true;
+  });
+
+  // Clona o array para adicionar o painel apenas para admins na aba Configurações
+  const sections = [...filteredNavSections];
+
+  if (userRole === "admin") {
+    const configSection = sections.find(s => s.title === "Configurações");
+    if (configSection) {
+      // Deep clone para não mutar o objeto original cacheado do React
+      const newConfigSection = { ...configSection, items: [...configSection.items] };
+
+      // Adiciona no topo do submenu de configurações
+      newConfigSection.items.unshift({
+        label: "💎 SensoriAI Master (Platform)",
+        path: "/admin"
+      });
+
+      // Substitui no array
+      const configIndex = sections.findIndex(s => s.title === "Configurações");
+      sections[configIndex] = newConfigSection;
+    } else {
+      // Se por algum motivo não achar, cria uma aba nova de Super Admin
+      sections.unshift({ title: "Super Admin", icon: Shield, basePath: "/admin", items: [{ label: "Painel Plataforma", path: "/admin" }] });
+    }
+  }
 
   const [expanded, setExpanded] = useState<string | null>(() => {
     const active = sections.find((s) =>

@@ -18,6 +18,8 @@ interface UserRole {
   role: "admin" | "user";
 }
 
+export type ModulosPermitidos = Record<string, boolean>;
+
 /** Acesso permitido se: hoje <= trial_expires_at OU subscription_active === true */
 function hasAccess(profile: Profile | null): boolean {
   if (!profile) return false;
@@ -34,6 +36,8 @@ interface AuthContextType {
   loading: boolean;
   /** Se o usuário pode usar o app (trial válido ou assinatura ativa) */
   hasAccess: boolean;
+  /** Permissões de módulos baseado no Perfil de Acesso do usuário */
+  modulos: ModulosPermitidos;
   signOut: () => Promise<void>;
 }
 
@@ -44,7 +48,8 @@ const AuthContext = createContext<AuthContextType>({
   userRole: null,
   loading: true,
   hasAccess: false,
-  signOut: async () => {},
+  modulos: {},
+  signOut: async () => { },
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -52,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
+  const [modulos, setModulos] = useState<ModulosPermitidos>({});
   const [loading, setLoading] = useState(true);
 
   /** Garante que o perfil existe no banco e está em sync com auth (email ou Google). Trial 3 dias é definido no trigger ao criar usuário. */
@@ -84,6 +90,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserRole(data?.role as "admin" | "user" ?? "user");
   };
 
+  const fetchModulos = async (userId: string) => {
+    // Busca as permissoes do role atual do usuario na nova estrutura RBAC
+    const { data } = await supabase.from("usuario_clinica").select("perfil_acesso_id").eq("user_id", userId).maybeSingle();
+    let permissoes: ModulosPermitidos = {};
+    if (data && data.perfil_acesso_id) {
+      const { data: mods } = await supabase.from("modulos_permissao").select("modulo, acesso_liberado").eq("perfil_acesso_id", data.perfil_acesso_id);
+      mods?.forEach(m => permissoes[m.modulo] = m.acesso_liberado);
+    } else {
+      // Se o usuario for root/owner e nao tiver perfil, damos acesso full
+      permissoes = { dashboard: true, agenda: true, prontuarios: true, financeiro: true, estoque: true, configuracoes: true };
+    }
+    setModulos(permissoes);
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -91,12 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
         if (session?.user) {
-          ensureUserProfile(session.user).catch(() => {});
+          ensureUserProfile(session.user).catch(() => { });
           fetchProfile(session.user.id);
           fetchRole(session.user.id);
+          fetchModulos(session.user.id);
         } else {
           setProfile(null);
           setUserRole(null);
+          setModulos({});
         }
       }
     );
@@ -106,9 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
       if (session?.user) {
-        ensureUserProfile(session.user).catch(() => {});
+        ensureUserProfile(session.user).catch(() => { });
         fetchProfile(session.user.id);
         fetchRole(session.user.id);
+        fetchModulos(session.user.id);
       }
     }).catch(() => {
       setLoading(false);
@@ -127,11 +150,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setProfile(null);
     setUserRole(null);
+    setModulos({});
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, userRole, loading, hasAccess: hasAccess(profile), signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, userRole, modulos, loading, hasAccess: hasAccess(profile), signOut }}>
       {children}
     </AuthContext.Provider>
   );

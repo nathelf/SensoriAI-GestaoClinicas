@@ -66,6 +66,7 @@ const Frequencia = lazy(() => import("./pages/contatos/Frequencia"));
 const MesclarContatos = lazy(() => import("./pages/contatos/MesclarContatos"));
 const ConvidarColaboradores = lazy(() => import("./pages/contatos/ConvidarColaboradores"));
 const PreferenciasSistema = lazy(() => import("./pages/configuracoes/PreferenciasSistema"));
+const ConfiguracoesClinica = lazy(() => import("./pages/ConfiguracoesClinica"));
 const DadosClinica = lazy(() => import("./pages/configuracoes/DadosClinica"));
 const Assinatura = lazy(() => import("./pages/configuracoes/Assinatura"));
 const Procedimentos = lazy(() => import("./pages/configuracoes/Procedimentos"));
@@ -90,83 +91,84 @@ const App = () => (
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Landing />} />
-            <Route path="/sobre" element={<Sobre />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/assinar" element={<AssinarPorToken />} />
+              <Route path="/sobre" element={<Sobre />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/assinar" element={<AssinarPorToken />} />
               <Route path="/acesso-expirado" element={<AcessoExpirado />} />
 
-            {/* Protected routes */}
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/perfil" element={<Perfil />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/alertas-retorno" element={<AlertasRetorno />} />
-              <Route path="/novo-atendimento" element={<NovoAtendimento />} />
-              <Route path="/historico" element={<HistoricoProcedimentos />} />
-              <Route path="/galeria" element={<GaleriaEvolucao />} />
-              <Route path="/agenda" element={<Agenda />} />
-              <Route path="/agenda/bloqueios" element={<AgendaBloqueios />} />
-              <Route path="/agenda/links" element={<AgendaLinks />} />
-              <Route path="/pacientes" element={<Pacientes />} />
-              <Route path="/clinidocs" element={<CliniDocs />} />
-              <Route path="/documentos/conversor" element={<DocumentosConversor />} />
-              <Route path="/documentos/assinatura/:id" element={<DocumentoAssinatura />} />
-              <Route path="/comunicacao" element={<Comunicacao />} />
-              <Route path="/pacientes/comunicacao" element={<PacientesComunicacao />} />
-              {/* Financeiro */}
-              <Route path="/financeiro" element={<Financeiro />} />
-              <Route path="/financeiro/receber" element={<ContasReceber />} />
-              <Route path="/financeiro/pagar" element={<ContasPagar />} />
-              <Route path="/financeiro/extrato" element={<ExtratoMovimentacoes />} />
-              <Route path="/financeiro/competencia" element={<RelatorioCompetencia />} />
-              <Route path="/financeiro/caixa-diario" element={<FluxoCaixaDiario />} />
-              <Route path="/financeiro/caixa-mensal" element={<FluxoCaixaMensal />} />
-              <Route path="/financeiro/categorias" element={<RelatorioCategorias />} />
-              <Route path="/financeiro/contas" element={<ContasFinanceiras />} />
-              <Route path="/financeiro/categorias-contas" element={<CategoriasContas />} />
-              <Route path="/financeiro/metodos" element={<MetodosPagamento />} />
-              <Route path="/financeiro/maquininha" element={<IntegracaoMaquininha />} />
-              <Route path="/vendas" element={<Vendas />} />
-              {/* Comissões */}
-              <Route path="/comissoes" element={<Comissoes />} />
-              <Route path="/comissoes/aberto" element={<EmAberto />} />
-              <Route path="/comissoes/finalizadas" element={<ComissoesFinalizadas />} />
-              <Route path="/comissoes/tabela-vendas" element={<TabelaVendas />} />
-              <Route path="/comissoes/tabela-atendimento" element={<TabelaAtendimento />} />
-              <Route path="/comissoes/relatorio" element={<RelatorioComissoes />} />
-              {/* Contatos */}
-              <Route path="/contatos/profissionais" element={<Profissionais />} />
-              <Route path="/contatos/fornecedores" element={<Fornecedores />} />
-              <Route path="/contatos/leads" element={<Leads />} />
-              <Route path="/contatos/todos" element={<TodosContatos />} />
-              <Route path="/contatos/aniversariantes" element={<Aniversariantes />} />
-              <Route path="/contatos/frequencia" element={<Frequencia />} />
-              <Route path="/contatos/mesclar" element={<MesclarContatos />} />
-              <Route path="/contatos/convidar" element={<ConvidarColaboradores />} />
-              {/* Estoque */}
-              <Route path="/estoque" element={<Estoque />} />
-              <Route path="/estoque/pedidos" element={<EstoquePedidos />} />
-              {/* SensoriAI */}
-              <Route path="/sensori/chat" element={<SensoriAIChat />} />
-              <Route path="/sensori/analisador" element={<SensoriAIAnalisador />} />
-              <Route path="/sensori/config" element={<SensoriAIConfig />} />
-              {/* Configurações */}
-              <Route path="/configuracoes" element={<PreferenciasSistema />} />
-              <Route path="/configuracoes/clinica" element={<DadosClinica />} />
-              <Route path="/configuracoes/assinatura" element={<Assinatura />} />
-              <Route path="/configuracoes/procedimentos" element={<Procedimentos />} />
-              <Route path="/configuracoes/categorias-procedimentos" element={<CategoriasProcedimentos />} />
-              <Route path="/configuracoes/pacotes" element={<Pacotes />} />
-              <Route path="/configuracoes/salas" element={<SalasAtendimento />} />
-              <Route path="/configuracoes/fichas" element={<FichasAtendimentos />} />
-              <Route path="/configuracoes/modelos" element={<ModelosAtestados />} />
-              <Route path="/configuracoes/etiquetas" element={<Etiquetas />} />
-              <Route path="/configuracoes/horarios" element={<HorariosFuncionamento />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
+              {/* Protected routes */}
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/perfil" element={<Perfil />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/alertas-retorno" element={<AlertasRetorno />} />
+                <Route path="/novo-atendimento" element={<NovoAtendimento />} />
+                <Route path="/historico" element={<HistoricoProcedimentos />} />
+                <Route path="/galeria" element={<GaleriaEvolucao />} />
+                <Route path="/agenda" element={<Agenda />} />
+                <Route path="/agenda/bloqueios" element={<AgendaBloqueios />} />
+                <Route path="/agenda/links" element={<AgendaLinks />} />
+                <Route path="/pacientes" element={<Pacientes />} />
+                <Route path="/clinidocs" element={<CliniDocs />} />
+                <Route path="/documentos/conversor" element={<DocumentosConversor />} />
+                <Route path="/documentos/assinatura/:id" element={<DocumentoAssinatura />} />
+                <Route path="/comunicacao" element={<Comunicacao />} />
+                <Route path="/pacientes/comunicacao" element={<PacientesComunicacao />} />
+                {/* Financeiro */}
+                <Route path="/financeiro" element={<Financeiro />} />
+                <Route path="/financeiro/receber" element={<ContasReceber />} />
+                <Route path="/financeiro/pagar" element={<ContasPagar />} />
+                <Route path="/financeiro/extrato" element={<ExtratoMovimentacoes />} />
+                <Route path="/financeiro/competencia" element={<RelatorioCompetencia />} />
+                <Route path="/financeiro/caixa-diario" element={<FluxoCaixaDiario />} />
+                <Route path="/financeiro/caixa-mensal" element={<FluxoCaixaMensal />} />
+                <Route path="/financeiro/categorias" element={<RelatorioCategorias />} />
+                <Route path="/financeiro/contas" element={<ContasFinanceiras />} />
+                <Route path="/financeiro/categorias-contas" element={<CategoriasContas />} />
+                <Route path="/financeiro/metodos" element={<MetodosPagamento />} />
+                <Route path="/financeiro/maquininha" element={<IntegracaoMaquininha />} />
+                <Route path="/vendas" element={<Vendas />} />
+                {/* Comissões */}
+                <Route path="/comissoes" element={<Comissoes />} />
+                <Route path="/comissoes/aberto" element={<EmAberto />} />
+                <Route path="/comissoes/finalizadas" element={<ComissoesFinalizadas />} />
+                <Route path="/comissoes/tabela-vendas" element={<TabelaVendas />} />
+                <Route path="/comissoes/tabela-atendimento" element={<TabelaAtendimento />} />
+                <Route path="/comissoes/relatorio" element={<RelatorioComissoes />} />
+                {/* Contatos */}
+                <Route path="/contatos/profissionais" element={<Profissionais />} />
+                <Route path="/contatos/fornecedores" element={<Fornecedores />} />
+                <Route path="/contatos/leads" element={<Leads />} />
+                <Route path="/contatos/todos" element={<TodosContatos />} />
+                <Route path="/contatos/aniversariantes" element={<Aniversariantes />} />
+                <Route path="/contatos/frequencia" element={<Frequencia />} />
+                <Route path="/contatos/mesclar" element={<MesclarContatos />} />
+                <Route path="/contatos/convidar" element={<ConvidarColaboradores />} />
+                {/* Estoque */}
+                <Route path="/estoque" element={<Estoque />} />
+                <Route path="/estoque/pedidos" element={<EstoquePedidos />} />
+                {/* SensoriAI */}
+                <Route path="/sensori/chat" element={<SensoriAIChat />} />
+                <Route path="/sensori/analisador" element={<SensoriAIAnalisador />} />
+                <Route path="/sensori/config" element={<SensoriAIConfig />} />
+                {/* Configurações */}
+                <Route path="/configuracoes" element={<PreferenciasSistema />} />
+                <Route path="/config-clinica" element={<ConfiguracoesClinica />} />
+                <Route path="/configuracoes/clinica" element={<DadosClinica />} />
+                <Route path="/configuracoes/assinatura" element={<Assinatura />} />
+                <Route path="/configuracoes/procedimentos" element={<Procedimentos />} />
+                <Route path="/configuracoes/categorias-procedimentos" element={<CategoriasProcedimentos />} />
+                <Route path="/configuracoes/pacotes" element={<Pacotes />} />
+                <Route path="/configuracoes/salas" element={<SalasAtendimento />} />
+                <Route path="/configuracoes/fichas" element={<FichasAtendimentos />} />
+                <Route path="/configuracoes/modelos" element={<ModelosAtestados />} />
+                <Route path="/configuracoes/etiquetas" element={<Etiquetas />} />
+                <Route path="/configuracoes/horarios" element={<HorariosFuncionamento />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </AuthProvider>
