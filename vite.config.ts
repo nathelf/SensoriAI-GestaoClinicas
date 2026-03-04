@@ -27,7 +27,7 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["react", "react-dom"],
+    include: ["react", "react-dom", "lucide-react"],
   },
   server: {
     host: "::",
@@ -44,8 +44,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React primeiro para evitar "Class extends value undefined" em libs que estendem Component
+          // React + lucide-react juntos para evitar forwardRef undefined (lucide usa React.forwardRef)
           if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "react";
+          if (id.includes("node_modules/lucide-react")) return "react";
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/jszip") || id.includes("node_modules/canvg")) return "pdf";
