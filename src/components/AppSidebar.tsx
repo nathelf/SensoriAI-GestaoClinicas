@@ -74,6 +74,7 @@ const navSections: NavSection[] = [
     items: [
       { label: "Documentos e Termos", path: "/clinidocs" },
       { label: "Relatórios Inteligentes", path: "/relatorios-ia" },
+      { label: "Modelos de Relatório", path: "/relatorios/templates" },
       { label: "Conversor de Documentos", path: "/documentos/conversor" },
       { label: "Comunicação", path: "/comunicacao" },
     ],

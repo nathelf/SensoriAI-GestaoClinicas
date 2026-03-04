@@ -91,3 +91,12 @@ BEGIN
   INSERT INTO public.users_onboarding (user_id) VALUES (NEW.id);
   RETURN NEW;
 END; $$;
+
+-- 7) Pacientes – colunas clínicas para relatório médico (estilo Clinicarx)
+ALTER TABLE public.patients
+  ADD COLUMN IF NOT EXISTS tipo_sanguineo TEXT CHECK (tipo_sanguineo IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')),
+  ADD COLUMN IF NOT EXISTS alergias TEXT,
+  ADD COLUMN IF NOT EXISTS observacoes_clinicas TEXT,
+  ADD COLUMN IF NOT EXISTS endereco_completo TEXT,
+  ADD COLUMN IF NOT EXISTS responsavel_nome TEXT,
+  ADD COLUMN IF NOT EXISTS responsavel_cpf TEXT;

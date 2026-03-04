@@ -20,8 +20,15 @@ interface UserRole {
 
 export type ModulosPermitidos = Record<string, boolean>;
 
-/** Acesso permitido se: hoje <= trial_expires_at OU subscription_active === true */
-function hasAccess(profile: Profile | null): boolean {
+/**
+ * Hierarquia de validação (checklist lógico):
+ * 1. Admin: ignora assinatura → acesso liberado
+ * 2. Assinatura ativa (subscription_active) → acesso liberado
+ * 3. Trial: hoje <= trial_expires_at → acesso liberado
+ * 4. Caso contrário → sem acesso
+ */
+function computeHasAccess(profile: Profile | null, userRole: "admin" | "user" | null): boolean {
+  if (userRole === "admin") return true;
   if (!profile) return false;
   if (profile.subscription_active) return true;
   if (!profile.trial_expires_at) return false;
@@ -104,40 +111,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setModulos(permissoes);
   };
 
+  /** Carrega profile e role. Usa maybeSingle para não falhar quando não há linha. Timeout 5s para evitar travamento. */
+  const loadUserData = async (user: User) => {
+    const timeout = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+    try {
+      await Promise.race([
+        (async () => {
+          await ensureUserProfile(user).catch(() => {});
+          const [profileRes, roleRes] = await Promise.all([
+            supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
+            supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle(),
+          ]);
+          setProfile(profileRes?.data ?? null);
+          const role = (roleRes?.data?.role as "admin" | "user") ?? "user";
+          setUserRole(role);
+          if (role === "admin") {
+            setModulos({ dashboard: true, agenda: true, prontuarios: true, financeiro: true, estoque: true, configuracoes: true });
+          } else {
+            fetchModulos(user.id).catch(() => {});
+          }
+        })(),
+        timeout(5000),
+      ]);
+    } catch (e) {
+      console.warn("loadUserData:", e);
+      setProfile(null);
+      setUserRole("user");
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
-        if (session?.user) {
-          ensureUserProfile(session.user).catch(() => { });
-          fetchProfile(session.user.id);
-          fetchRole(session.user.id);
-          fetchModulos(session.user.id);
-        } else {
+        if (!session?.user) {
           setProfile(null);
           setUserRole(null);
           setModulos({});
+          setLoading(false);
+          return;
         }
+        await loadUserData(session.user);
+        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        ensureUserProfile(session.user).catch(() => { });
-        fetchProfile(session.user.id);
-        fetchRole(session.user.id);
-        fetchModulos(session.user.id);
+      if (!session?.user) {
+        setLoading(false);
+        return;
       }
-    }).catch(() => {
+      await loadUserData(session.user);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
-    const safetyTimer = setTimeout(() => setLoading(false), 2000);
+    const safetyTimer = setTimeout(() => setLoading(false), 3000);
 
     return () => {
       subscription.unsubscribe();
@@ -155,7 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, userRole, modulos, loading, hasAccess: hasAccess(profile), signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, userRole, modulos, loading, hasAccess: computeHasAccess(profile, userRole), signOut }}>
       {children}
     </AuthContext.Provider>
   );

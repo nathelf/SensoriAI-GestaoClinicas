@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -19,6 +19,7 @@ import {
 import { SensoriAILogo } from "@/components/SensoriAILogo";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { supabase, hasSupabaseConfig } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const float = {
@@ -66,6 +67,15 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { user: authUser, loading: authLoading } = useAuth();
+
+  // Redireciona quando o usuário está logado (evita race: navegar só após auth propagar)
+  useEffect(() => {
+    if (!authLoading && authUser) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [authUser, authLoading, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -81,7 +91,7 @@ export default function Auth() {
         const { data, error } = await Promise.race([signInPromise, timeoutPromise]);
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
-        navigate("/dashboard", { replace: true });
+        // Não navegar aqui: o useEffect redireciona quando authUser for atualizado
       } else {
         const { error } = await supabase.auth.signUp({
           email,

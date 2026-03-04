@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Settings, Users, Shield, Building, Save, Plus, Trash2, Key, Loader2, PlaySquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -47,7 +48,8 @@ const MODULOS_SISTEMA = [
 ];
 
 export default function ConfiguracoesClinica() {
-    const { user } = useAuth();
+    const { user, userRole } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     const [clinica, setClinica] = useState<ClinicaConfig | null>(null);
@@ -69,7 +71,11 @@ export default function ConfiguracoesClinica() {
     const carregarDados = async () => {
         setLoading(true);
         try {
-            // 1. Puxar a clinica do usuario atual
+            if (userRole === "admin") {
+                navigate("/admin", { replace: true });
+                setLoading(false);
+                return;
+            }
             const { data: vinculo } = await supabase.from("usuario_clinica").select("clinica_id").eq("user_id", user?.id).maybeSingle();
             if (!vinculo) {
                 setLoading(false);

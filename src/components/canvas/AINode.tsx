@@ -1,9 +1,11 @@
 import { NodeProps } from '@xyflow/react';
 import { BrainCircuit, Sparkles, Activity } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { NodeHandle } from './NodeHandle';
+import { NodeDeleteButton } from './NodeDeleteButton';
 
-export function AINode({ data }: NodeProps) {
+export function AINode({ id, data }: NodeProps) {
     const isPdfMode = !!data.isPdfMode;
     const isConnected = !!data.isConnected;
     const isGenerating = !!data.isGenerating;
@@ -12,7 +14,7 @@ export function AINode({ data }: NodeProps) {
     return (
         <div className={`bg-gradient-to-br from-primary/5 to-purple-500/5 p-6 rounded-2xl border ${isConnected ? 'border-primary/50 shadow-md ring-2 ring-primary/20' : 'border-primary/20'} min-w-[350px] max-w-[400px] relative ${isPdfMode ? '' : 'transition-all'}`}>
 
-            {/* Handles nos 4 lados: área grande para a linha grudar na bolinha */}
+            <NodeDeleteButton nodeId={id} hidden={isPdfMode} />
             <NodeHandle position="top" />
             <NodeHandle position="right" />
             <NodeHandle position="bottom" />
@@ -28,7 +30,9 @@ export function AINode({ data }: NodeProps) {
                 </div>
                 <div className="flex-1 pt-1">
                     {content ? (
-                        <p className="text-foreground leading-relaxed text-sm">{content}</p>
+                        <div className="text-foreground leading-relaxed text-sm prose prose-sm dark:prose-invert max-w-none [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:text-foreground [&_ul]:my-1 [&_p]:my-1">
+                            <ReactMarkdown>{content}</ReactMarkdown>
+                        </div>
                     ) : (
                         <p className="text-muted-foreground italic text-sm">
                             {isConnected

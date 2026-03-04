@@ -19,7 +19,7 @@ export function AppLayout() {
     );
   }
 
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/auth" replace />;
   if (!hasAccess) return <Navigate to="/acesso-expirado" replace />;
 
   const initials = profile?.display_name

@@ -3,12 +3,18 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Max-Age": "86400",
 };
+
+function jsonResponse(data: object, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -41,11 +47,16 @@ serve(async (req) => {
       .single();
 
     if (roleError || !roleData || roleData.role !== "admin") {
-      return new Response(JSON.stringify({ error: "Acesso negado. Apenas admins." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ error: "Acesso negado. Apenas admins." }, 403);
     }
 
-    const body = await req.json();
-    const { targetUserId, action, payload } = body;
+    let body: { targetUserId?: string; action?: string; payload?: Record<string, unknown> } = {};
+    try {
+      body = await req.json();
+    } catch {
+      return jsonResponse({ error: "Corpo da requisição JSON inválido." }, 400);
+    }
+    const { targetUserId, action, payload = {} } = body;
 
     // AÇÕES DE CRIAÇÃO (não precisam de targetUserId previamente)
     if (action === "create-user") {
@@ -73,7 +84,7 @@ serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({ success: true, user_id: createdUser.user.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ success: true, user_id: createdUser.user.id });
     }
 
     // AÇÕES DE MANUTENÇÃO (precisam de targetUserId)
@@ -83,14 +94,14 @@ serve(async (req) => {
       const { email } = payload;
       const { error } = await supabaseAdmin.auth.admin.updateUserById(targetUserId, { email, email_confirm: true });
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ success: true });
     }
 
     if (action === "update-password") {
       const { password } = payload;
       const { error } = await supabaseAdmin.auth.admin.updateUserById(targetUserId, { password });
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ success: true });
     }
 
     if (action === "toggle-suspend") {
@@ -100,20 +111,18 @@ serve(async (req) => {
       const { error } = await supabaseAdmin.auth.admin.updateUserById(targetUserId, { ban_duration: banDuration });
       if (error) throw new Error(`Erro ao suspender no Auth: ${error.message}`);
 
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ success: true });
     }
 
     if (action === "delete-user") {
       const { error } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ success: true });
     }
 
-    throw new Error("Ação não reconhecida.");
+    return jsonResponse({ error: "Ação não reconhecida." }, 400);
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const msg = error instanceof Error ? error.message : String(error);
+    return jsonResponse({ error: msg }, 400);
   }
 });

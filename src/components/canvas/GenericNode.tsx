@@ -2,8 +2,9 @@ import { NodeProps } from '@xyflow/react';
 import * as Icons from 'lucide-react';
 import React from 'react';
 import { NodeHandle } from './NodeHandle';
+import { NodeDeleteButton } from './NodeDeleteButton';
 
-export function GenericNode({ data }: NodeProps) {
+export function GenericNode({ id, data }: NodeProps) {
     const isPdfMode = !!data.isPdfMode;
 
     const IconName = (data.iconName as string) || 'FileText';
@@ -14,6 +15,7 @@ export function GenericNode({ data }: NodeProps) {
 
     return (
         <div className={`bg-card border border-border/60 rounded-2xl shadow-sm min-w-[250px] p-6 relative ${isPdfMode ? '' : 'hover:shadow-md transition-shadow'}`}>
+            <NodeDeleteButton nodeId={id} hidden={isPdfMode} />
             <NodeHandle position="top" />
             <NodeHandle position="right" />
             <NodeHandle position="bottom" />

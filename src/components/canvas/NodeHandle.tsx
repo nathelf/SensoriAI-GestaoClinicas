@@ -17,16 +17,22 @@ const WRAPPER_POSITION: Record<Pos, string> = {
   left: '-left-2 top-1/2 -translate-x-1/2 -translate-y-1/2',
 };
 
-/** Bolinha visível e área de conexão maior para a linha grudar no nó */
+/** Bolinha discreta (8px visível), hitbox 28px para facilitar a conexão "imantar" ao ponto */
 const handleBase =
-  'rounded-full border-2 border-white shadow-lg transition-all duration-200 hover:!scale-110 hover:shadow-xl pointer-events-auto';
+  'rounded-full border-[10px] border-white shadow-md transition-all duration-200 hover:scale-110 hover:shadow-lg pointer-events-auto';
 
 export function NodeHandle({ position }: { position: Pos }) {
   const pos = POSITION_MAP[position];
   const wrapperCls = WRAPPER_POSITION[position];
   const colorStyle = getHandleStyle(position);
-  // Área maior (36px) para facilitar soltar a conexão na bolinha; o React Flow usa isso para hit
-  const handleStyle = { ...colorStyle, width: 36, height: 36, minWidth: 36, minHeight: 36 };
+  // 28x28 total, borda 10px = centro colorido ~8px (discreto). Hitbox ampla para conexão fácil.
+  const handleStyle = {
+    ...colorStyle,
+    width: 28,
+    height: 28,
+    minWidth: 28,
+    minHeight: 28,
+  };
 
   return (
     <div

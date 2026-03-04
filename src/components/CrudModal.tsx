@@ -74,10 +74,11 @@ export function CrudModal({ open, onClose, title, children, onSubmit, loading, s
   );
 }
 
-export function FormField({ label, children }: { label: string; children: ReactNode }) {
+export function FormField({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (
-    <div>
+    <div className={className}>
       <label className="text-xs font-medium text-muted-foreground mb-1 block">{label}</label>
+      {hint && <p className="text-[11px] text-muted-foreground/80 mb-1">{hint}</p>}
       {children}
     </div>
   );

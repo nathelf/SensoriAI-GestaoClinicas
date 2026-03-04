@@ -96,6 +96,10 @@ export function CanvasSidebar() {
                 </div>
 
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest pt-2 border-t border-border/50">Pacientes & Contatos</h4>
+                <div onDragStart={(e) => onDragStart(e, 'patientSelector')} draggable className={`${blockCls} border-2 border-dashed border-violet-400/50 hover:bg-violet-500/5`}>
+                    <div className={iconCls('', 'bg-violet-500/10', 'text-violet-600')}><Users size={18} /></div>
+                    <span className="text-sm font-bold text-violet-600">Perfil do Paciente</span>
+                </div>
                 <div onDragStart={(e) => onDragStart(e, 'generic', { label: 'Pacientes & Leads', iconName: 'Users', colorTheme: 'bg-violet-500/10 text-violet-600' })} draggable className={`${blockCls} hover:border-violet-500/50 hover:bg-violet-500/5`}>
                     <div className={iconCls('', 'bg-violet-500/10', 'text-violet-600')}><Users size={18} /></div>
                     <span className="text-sm font-medium text-foreground">Pacientes</span>

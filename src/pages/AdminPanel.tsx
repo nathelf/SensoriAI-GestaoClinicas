@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Users, CheckCircle, Percent, Pencil, Building, Search, DollarSign, Plus, Settings } from "lucide-react";
+import { Shield, Users, CheckCircle, Pencil, Building, Search, DollarSign, Plus, Settings, Ban, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -13,16 +14,11 @@ interface UserRow {
   user_id: string;
   display_name: string | null;
   clinic_name: string | null;
+  clinica_vinculada: string | null;
   role: string;
-  progress_percent: number;
-  task_agendamento: boolean;
-  task_atendimento: boolean;
-  task_venda: boolean;
-  task_lembretes: boolean;
-  task_documento: boolean;
-  reward_claimed: boolean;
   email: string | null;
   subscription_active: boolean;
+  trial_expires_at: string | null;
   is_suspended: boolean;
 }
 
@@ -45,6 +41,7 @@ const PRECO_ASSINATURA = 149.90;
 
 export default function AdminPanel() {
   const { userRole } = useAuth();
+  const navigate = useNavigate();
 
   // Data States
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -63,7 +60,12 @@ export default function AdminPanel() {
   const [newEmail, setNewEmail] = useState("");
   const [newPass, setNewPass] = useState("");
   const [newSuspended, setNewSuspended] = useState(false);
+  const [newSubscriptionActive, setNewSubscriptionActive] = useState(false);
+  const [newTrialExpiresAt, setNewTrialExpiresAt] = useState("");
+  const [newDisplayName, setNewDisplayName] = useState("");
+  const [newClinicName, setNewClinicName] = useState("");
   const [savingUser, setSavingUser] = useState(false);
+  const [togglingSuspend, setTogglingSuspend] = useState<string | null>(null);
 
   // Form Control - Edit Clinica
   const [editingClinica, setEditingClinica] = useState<ClinicaRow | null>(null);
@@ -93,49 +95,38 @@ export default function AdminPanel() {
     setLoadingUsers(true);
     setLoadingClinicas(true);
 
-    // Fetch users info
-    const { data: profiles } = await supabase.from("profiles").select("*");
-    const { data: roles } = await supabase.from("user_roles").select("*");
-    const { data: onboarding } = await supabase.from("users_onboarding").select("*");
-
-    if (profiles && roles) {
-      const merged = profiles.map(p => {
-        const role = roles.find(r => r.user_id === p.user_id);
-        const ob = onboarding?.find(o => o.user_id === p.user_id);
-        return {
-          user_id: p.user_id,
-          display_name: p.display_name,
-          email: p.email || null,
-          clinic_name: p.clinic_name,
-          role: role?.role || "user",
-          subscription_active: p.subscription_active || false,
-          is_suspended: p.is_suspended || false,
-          progress_percent: ob?.progress_percent || 0,
-          task_agendamento: ob?.task_agendamento || false,
-          task_atendimento: ob?.task_atendimento || false,
-          task_venda: ob?.task_venda || false,
-          task_lembretes: ob?.task_lembretes || false,
-          task_documento: ob?.task_documento || false,
-          reward_claimed: ob?.reward_claimed || false,
-        };
-      });
-      setUsers(merged);
+    // Usuários via RPC (JOIN auth.users, profiles, user_roles, usuario_clinica) — bypass para admin sem clinica_id
+    const { data: usersData, error: usersErr } = await supabase.rpc("get_all_users_for_admin");
+    const usersList = Array.isArray(usersData) ? (usersData as UserRow[]) : [];
+    if (usersErr) {
+      toast.error("Erro ao carregar usuários: " + usersErr.message);
+      setUsers([]);
+    } else {
+      setUsers(usersList);
     }
     setLoadingUsers(false);
 
-    // Fetch clinics
-    const { data: clinicasData } = await supabase.from("clinica_config").select("*").order("created_at", { ascending: false });
-    if (clinicasData && profiles) {
-      const enriched = clinicasData.map(c => {
-        const ownerProfile = profiles.find(p => p.user_id === c.owner_id);
-        return { ...c, owner_email: ownerProfile?.email || ownerProfile?.display_name || "Desconhecido" };
+    // Clínicas (admin pode ler todas graças à policy)
+    const { data: clinicasData, error: clinicasErr } = await supabase.from("clinica_config").select("*").order("created_at", { ascending: false });
+    if (clinicasErr) {
+      console.error("clinica_config:", clinicasErr);
+      toast.error("Erro ao carregar clínicas. Execute a migration 20260307000000_admin_users_management.sql no SQL Editor do Supabase.");
+    }
+    if (clinicasData) {
+      const enriched = clinicasData.map((c: any) => {
+        const owner = usersList.find((u: UserRow) => u.user_id === c.owner_id);
+        return { ...c, owner_email: owner?.email || owner?.display_name || "Desconhecido" };
       });
       setClinicas(enriched);
     }
     setLoadingClinicas(false);
 
-    // Fetch Perfis de Acesso
-    const { data: perfisData } = await supabase.from("perfis_acesso").select("*");
+    // Perfis de Acesso
+    const { data: perfisData, error: perfisErr } = await supabase.from("perfis_acesso").select("*");
+    if (perfisErr) {
+      console.error("perfis_acesso:", perfisErr);
+      toast.error("Erro ao carregar perfis. Verifique se a migration 20260307000000_admin_users_management.sql foi aplicada.");
+    }
     if (perfisData) setPerfis(perfisData);
   };
 
@@ -144,14 +135,23 @@ export default function AdminPanel() {
   }, [userRole]);
 
   const apiEdge = async (action: string, payload: any) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-manage-user`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${session?.access_token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, payload, targetUserId: payload.targetUserId })
+    const { data: { session } } = await supabase.auth.refreshSession();
+    if (!session?.access_token) {
+      throw new Error("Sessão expirada ou inválida. Limpe o cache (Application → Local Storage), faça logout e login novamente.");
+    }
+
+    const { data, error } = await supabase.functions.invoke("admin-manage-user", {
+      body: { action, payload, targetUserId: payload?.targetUserId },
     });
-    if (!res.ok) throw new Error(await res.text() || 'Erro desconhecido');
-    return await res.json();
+
+    if (error) {
+      if (error.message?.includes("401") || error.message?.includes("Unauthorized")) {
+        throw new Error("Token inválido. Limpe o Local Storage do site e faça login novamente.");
+      }
+      throw new Error(error.message || "Erro ao chamar a função.");
+    }
+    if (data?.error) throw new Error(data.error);
+    return data;
   };
 
   // =============== CREATE AÇÕES ===============
@@ -169,8 +169,8 @@ export default function AdminPanel() {
       // Atualizamos a clinica_config para o nome oficial que foi digitado
       await supabase.from("clinica_config").update({ nome_clinica: ccNome }).eq("owner_id", result.user_id);
 
-      // Atualizamos o profile também caso precisem de cache fácil
-      await supabase.from("profiles").update({ clinic_name: ccNome, email: ccDonoEmail }).eq("user_id", result.user_id);
+      const { error: profileErr } = await supabase.from("profiles").update({ clinic_name: ccNome, display_name: ccDonoNome || undefined }).eq("user_id", result.user_id);
+      if (profileErr) console.warn("Profile update:", profileErr);
 
       toast.success("Nova Clínica (Tenant) criada e Dono autorizado com sucesso!");
       setShowCreateClinica(false);
@@ -236,7 +236,7 @@ export default function AdminPanel() {
       if (error) { toast.error("Role master falhou"); errorOccurred = true; }
     }
 
-    // Suspensão / Inativação (Bloqueia Login em todo SaaS)
+    // Suspensão / Inativação
     if (editingUser.is_suspended !== newSuspended) {
       try {
         await apiEdge("toggle-suspend", { is_suspended: newSuspended, targetUserId: editingUser.user_id });
@@ -244,12 +244,40 @@ export default function AdminPanel() {
       } catch (err: any) { toast.error(`Falha ao suspender: ${err.message}`); errorOccurred = true; }
     }
 
-    if (!errorOccurred) { toast.success("Conta de Usuário atualizada com sucesso!"); }
+    // Nome, Clínica (profile), Assinatura e Trial
+    const profileUpdates: Record<string, unknown> = {};
+    if (editingUser.display_name !== newDisplayName && newDisplayName.trim() !== "") profileUpdates.display_name = newDisplayName;
+    if (editingUser.clinic_name !== newClinicName && newClinicName.trim() !== "") profileUpdates.clinic_name = newClinicName;
+    if (editingUser.subscription_active !== newSubscriptionActive) profileUpdates.subscription_active = newSubscriptionActive;
+    if (newTrialExpiresAt.trim() !== "") {
+      const parsed = new Date(newTrialExpiresAt);
+      if (!isNaN(parsed.getTime())) profileUpdates.trial_expires_at = parsed.toISOString();
+    }
+    if (Object.keys(profileUpdates).length > 0) {
+      const { error } = await supabase.from("profiles").update(profileUpdates).eq("user_id", editingUser.user_id);
+      if (error) { toast.error("Erro ao atualizar perfil: " + error.message); errorOccurred = true; }
+    }
+
+    if (!errorOccurred) toast.success("Conta de Usuário atualizada com sucesso!");
 
     await fetchData();
     setSavingUser(false);
     setNewPass("");
     setEditingUser(null);
+  };
+
+  const handleToggleSuspend = async (u: UserRow) => {
+    const next = !u.is_suspended;
+    setTogglingSuspend(u.user_id);
+    try {
+      await apiEdge("toggle-suspend", { is_suspended: next, targetUserId: u.user_id });
+      await supabase.from("profiles").update({ is_suspended: next }).eq("user_id", u.user_id);
+      toast.success(next ? "Usuário suspenso." : "Usuário ativado.");
+      await fetchData();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+    setTogglingSuspend(null);
   };
 
   const handleEditClinica = async (e: React.FormEvent) => {
@@ -277,15 +305,8 @@ export default function AdminPanel() {
   };
 
   if (userRole !== "admin") {
-    return (
-      <div className="p-4 lg:p-6 max-w-5xl mx-auto flex items-center justify-center min-h-[50vh]">
-        <div className="text-center py-20 p-8 stat-card">
-          <Shield className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-foreground mb-2">Acesso Restrito</h1>
-          <p className="text-sm text-muted-foreground">O Painel Plataforma SensoriAI é exclusivo para Proprietários e Administradores da Rede.</p>
-        </div>
-      </div>
-    );
+    navigate("/dashboard", { replace: true });
+    return null;
   }
 
   // Filtragem
@@ -296,7 +317,8 @@ export default function AdminPanel() {
 
   const filteredUsers = users.filter(u =>
     u.display_name?.toLowerCase().includes(searchUser.toLowerCase()) ||
-    u.email?.toLowerCase().includes(searchUser.toLowerCase())
+    u.email?.toLowerCase().includes(searchUser.toLowerCase()) ||
+    u.clinica_vinculada?.toLowerCase().includes(searchUser.toLowerCase())
   );
 
   const activeClinics = clinicas.filter(c => c.assinatura_ativa).length;
@@ -304,8 +326,8 @@ export default function AdminPanel() {
 
   return (
     <div className="p-4 lg:p-6 max-w-7xl mx-auto">
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm p-6 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
               <Shield className="w-6 h-6 text-primary-foreground" />
@@ -444,13 +466,13 @@ export default function AdminPanel() {
 
           {/* ABA: USUÁRIOS */}
           <TabsContent value="usuarios" className="space-y-4 outline-none">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-card p-4 rounded-2xl border border-border/50 shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-4 shadow-sm">
               <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Busca por nome completo ou email unitário..."
-                  className="w-full pl-9 pr-4 h-10 bg-background border border-border/50 text-foreground text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-primary transition-shadow"
+                  placeholder="Buscar por e-mail, nome ou clínica..."
+                  className="w-full pl-9 pr-4 h-10 bg-background/80 border border-border/50 text-foreground text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow"
                   value={searchUser}
                   onChange={e => setSearchUser(e.target.value)}
                 />
@@ -463,53 +485,77 @@ export default function AdminPanel() {
               </button>
             </div>
 
-            {loadingUsers ? <div className="text-center py-16 text-muted-foreground text-sm stat-card mt-4">Sincronizando contas na rede auth...</div> :
-              <div className="stat-card overflow-x-auto !p-0 mt-4 shadow-sm">
+            {loadingUsers ? <div className="text-center py-16 text-muted-foreground text-sm rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm mt-4">Carregando usuários...</div> :
+              <div className="overflow-x-auto mt-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm shadow-sm">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border/50 bg-muted/40 uppercase tracking-wider text-[11px]">
-                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Status Cidadão</th>
-                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Level Matriz do Usuário</th>
-                      <th className="text-left py-4 px-6 text-muted-foreground font-bold hidden sm:table-cell">Integração do Cidadão</th>
-                      <th className="py-4 px-6 text-right">Auditoria / Bloqueio</th>
+                    <tr className="border-b border-border/50 bg-muted/30 uppercase tracking-wider text-[11px]">
+                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Nome / E-mail</th>
+                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Clínica</th>
+                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Role</th>
+                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Assinatura</th>
+                      <th className="text-left py-4 px-6 text-muted-foreground font-bold">Status</th>
+                      <th className="py-4 px-6 text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/20">
                     {filteredUsers.map(u => (
-                      <tr key={u.user_id} className={`hover:bg-muted/30 transition-colors ${u.is_suspended ? 'opacity-50' : ''}`}>
-                        <td className="py-4 px-6 flex items-center gap-3">
-                          <div className={`w-2.5 h-2.5 rounded-full shadow-sm flex-shrink-0 ${u.is_suspended ? 'bg-destructive' : 'bg-success'}`}></div>
-                          <div>
-                            <p className="font-bold text-foreground text-[14px]">{u.display_name || "Membro Anônimo"}</p>
-                            <p className="text-xs font-mono tracking-tight text-muted-foreground mt-0.5">{u.email}</p>
+                      <tr key={u.user_id} className={`hover:bg-muted/20 transition-colors ${u.is_suspended ? 'opacity-60' : ''}`}>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${u.is_suspended ? 'bg-destructive' : 'bg-success'}`} />
+                            <div>
+                              <p className="font-semibold text-foreground text-[14px]">{u.display_name || "—"}</p>
+                              <p className="text-xs font-mono text-muted-foreground">{u.email || "—"}</p>
+                            </div>
                           </div>
                         </td>
+                        <td className="py-4 px-6 text-muted-foreground text-[13px]">{u.clinica_vinculada || u.clinic_name || "—"}</td>
                         <td className="py-4 px-6">
-                          <span className={`text-[10px] px-2.5 py-1 rounded-md font-bold tracking-wider uppercase inline-flex items-center gap-1.5 shadow-sm border ${u.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-muted border-border/50 text-muted-foreground"}`}>
-                            {u.role === "admin" ? <Shield className="w-3 h-3" /> : ''}
-                            {u.role === "admin" ? "SuperAdmin Host" : "Funcionário Standard"}
+                          <span className={`text-[10px] px-2.5 py-1 rounded-lg font-bold tracking-wider uppercase inline-flex items-center gap-1 border ${u.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-muted/80 border-border/50 text-muted-foreground"}`}>
+                            {u.role === "admin" ? <Shield className="w-3 h-3" /> : null}
+                            {u.role === "admin" ? "Admin" : "User"}
                           </span>
                         </td>
-                        <td className="py-4 px-6 hidden sm:table-cell">
-                          <div className="flex items-center gap-3 max-w-[150px]">
-                            <div className="flex-1 bg-muted rounded-full h-1.5 shadow-inner overflow-hidden border border-border/30">
-                              <div className="bg-primary h-full transition-all" style={{ width: `${u.progress_percent}%` }} />
-                            </div>
-                            <span className="text-xs font-bold text-muted-foreground font-mono">{u.progress_percent}%</span>
-                          </div>
+                        <td className="py-4 px-6">
+                          {u.subscription_active ? (
+                            <span className="text-[11px] px-2 py-1 rounded-lg bg-success/10 text-success-foreground font-semibold border border-success/30">Ativa</span>
+                          ) : u.trial_expires_at && new Date(u.trial_expires_at) >= new Date() ? (
+                            <span className="text-[11px] px-2 py-1 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold border border-amber-500/30">Trial</span>
+                          ) : (
+                            <span className="text-[11px] px-2 py-1 rounded-lg bg-muted border border-border/50 text-muted-foreground">Expirado</span>
+                          )}
                         </td>
-                        <td className="py-4 px-6 text-right">
-                          <button
-                            onClick={() => {
-                              setEditingUser(u);
-                              setNewRole(u.role);
-                              setNewEmail(u.email || "");
-                              setNewSuspended(u.is_suspended);
-                            }}
-                            className="p-1.5 rounded-lg border border-border/40 hover:bg-muted hover:border-border text-foreground transition-colors inline-block ml-auto shadow-sm"
-                          >
-                            <Pencil className="w-4 h-4 text-muted-foreground" />
-                          </button>
+                        <td className="py-4 px-6">
+                          {u.is_suspended ? <span className="text-destructive font-semibold text-xs">Suspenso</span> : <span className="text-success font-semibold text-xs">Ativo</span>}
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => handleToggleSuspend(u)}
+                              disabled={togglingSuspend === u.user_id}
+                              className="p-2 rounded-lg border border-border/40 hover:bg-muted hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors"
+                              title={u.is_suspended ? "Ativar" : "Suspender"}
+                            >
+                              <Ban className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingUser(u);
+                                setNewRole(u.role);
+                                setNewEmail(u.email || "");
+                                setNewSuspended(u.is_suspended);
+                                setNewDisplayName(u.display_name || "");
+                                setNewClinicName(u.clinic_name || "");
+                                setNewSubscriptionActive(u.subscription_active);
+                                setNewTrialExpiresAt(u.trial_expires_at ? format(new Date(u.trial_expires_at), "yyyy-MM-dd") : "");
+                              }}
+                              className="p-2 rounded-lg border border-border/40 hover:bg-muted hover:border-primary/50 text-muted-foreground hover:text-primary transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -609,43 +655,61 @@ export default function AdminPanel() {
         </FormField>
       </CrudModal>
 
-      {/* MODAL EDIÇÃO USUÁRIO / EXTREME ENFORCEMENT */}
-      <CrudModal open={!!editingUser} onClose={() => setEditingUser(null)} title="Credenciais Individuais" onSubmit={handleEditUser} loading={savingUser}>
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <FormField label="E-mail Matriz do Indivíduo">
-              <input type="email" className="w-full font-mono text-sm h-11 px-4 bg-background border border-border/50 text-foreground rounded-xl" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
-            </FormField>
-          </div>
-        </div>
-
-        <FormField label="Modificar Senha Brutalmente" hint="Se preenchido e salvo, a senha atual deste usuário é rasgada e substituída na hora. Deixe em branco para ignorar.">
-          <input type="password" placeholder="Uma nova senha (no mínimo 6 dígitos)" className="w-full h-11 px-4 bg-background border border-border/50 text-foreground text-sm rounded-xl focus:outline-none focus:border-warning focus:ring-1 focus:ring-warning transition-all placeholder:text-muted-foreground/40" value={newPass} onChange={e => setNewPass(e.target.value)} />
+      {/* MODAL EDIÇÃO USUÁRIO */}
+      <CrudModal open={!!editingUser} onClose={() => setEditingUser(null)} title="Editar Usuário" onSubmit={handleEditUser} loading={savingUser} size="large">
+        <FormField label="Nome de exibição">
+          <input type="text" className="w-full h-11 px-4 bg-background border border-border/50 text-foreground rounded-xl" value={newDisplayName} onChange={e => setNewDisplayName(e.target.value)} placeholder="Nome completo" />
         </FormField>
 
-        <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 my-4">
-          <FormField label="Extrema Sanção (Banimento Login)" hint="O usuário nem passará da tela de Loading se isto estiver ativo. É barrado no gate da API.">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setNewSuspended(!newSuspended)}
-                className={`w-12 h-6 rounded-full relative transition-all shadow-inner ${newSuspended ? 'bg-destructive' : 'bg-muted-foreground/30'}`}
-              >
-                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-300 ${newSuspended ? 'left-[26px]' : 'left-0.5'}`} />
-              </button>
-              <span className={`text-sm font-bold tracking-wide block ${newSuspended ? 'text-destructive' : 'text-foreground'}`}>
-                {newSuspended ? "CONTA BANIIDA PERMANENTE" : "Conta Ativa Ordinária"}
-              </span>
-            </div>
+        <FormField label="E-mail">
+          <input type="email" className="w-full font-mono text-sm h-11 px-4 bg-background border border-border/50 text-foreground rounded-xl" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
+        </FormField>
+
+        <FormField label="Nome da clínica (profile)" hint="Opcional. Usado quando o usuário não está vinculado a uma clínica em usuario_clinica.">
+          <input type="text" className="w-full h-11 px-4 bg-background border border-border/50 text-foreground rounded-xl" value={newClinicName} onChange={e => setNewClinicName(e.target.value)} placeholder="Nome da clínica" />
+        </FormField>
+
+        <div className="flex gap-4 items-end">
+          <FormField label="Perfil de acesso (Role)" className="flex-1">
+            <FormSelect value={newRole} onChange={e => setNewRole(e.target.value)}>
+              <option value="user">User (acesso limitado pela clínica)</option>
+              <option value="admin">Admin (acesso total à plataforma)</option>
+            </FormSelect>
           </FormField>
         </div>
 
-        <div className="border-t border-border/40 pt-5">
-          <FormField label="Privilégio Cidadão (Role de Nuvem Máxima)">
-            <FormSelect value={newRole} onChange={e => setNewRole(e.target.value)}>
-              <option value="user">USER (Visão Limitada pela Clínica)</option>
-              <option value="admin">ROOT / ADMIN (Dono de Plataforma SaaS)</option>
-            </FormSelect>
+        <div className="border-t border-border/40 pt-5 space-y-4">
+          <h4 className="text-sm font-bold text-foreground flex items-center gap-2"><KeyRound className="w-4 h-4" /> Resetar Senha</h4>
+          <FormField label="Nova senha" hint="Preencha para alterar a senha. Deixe em branco para manter a atual.">
+            <input type="password" minLength={6} placeholder="Mínimo 6 caracteres" className="w-full h-11 px-4 bg-background border border-border/50 text-foreground text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/50" value={newPass} onChange={e => setNewPass(e.target.value)} />
+          </FormField>
+        </div>
+
+        <div className="border-t border-border/40 pt-5 space-y-4">
+          <h4 className="text-sm font-bold text-foreground">Gestão de Assinatura</h4>
+          <FormField label="Assinatura ativa" hint="Quando ativo, o usuário tem acesso completo independente do trial.">
+            <div className="flex items-center gap-3 p-3 rounded-xl border border-border/40">
+              <button type="button" onClick={() => setNewSubscriptionActive(!newSubscriptionActive)} className={`w-12 h-6 rounded-full relative transition-all ${newSubscriptionActive ? 'bg-success' : 'bg-muted-foreground/30'}`}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all duration-300 ${newSubscriptionActive ? 'left-[26px]' : 'left-0.5'}`} />
+              </button>
+              <span className="text-sm font-medium">{newSubscriptionActive ? "Ativa" : "Inativa"}</span>
+            </div>
+          </FormField>
+          <FormField label="Trial expira em" hint="Data em que o período de teste termina. Formato: AAAA-MM-DD">
+            <input type="date" className="w-full h-11 px-4 bg-background border border-border/50 text-foreground rounded-xl" value={newTrialExpiresAt} onChange={e => setNewTrialExpiresAt(e.target.value)} />
+          </FormField>
+        </div>
+
+        <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
+          <FormField label="Suspender usuário" hint="Usuário suspenso não consegue fazer login.">
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setNewSuspended(!newSuspended)} className={`w-12 h-6 rounded-full relative transition-all ${newSuspended ? 'bg-destructive' : 'bg-muted-foreground/30'}`}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all duration-300 ${newSuspended ? 'left-[26px]' : 'left-0.5'}`} />
+              </button>
+              <span className={`text-sm font-bold ${newSuspended ? 'text-destructive' : 'text-foreground'}`}>
+                {newSuspended ? "Suspenso" : "Ativo"}
+              </span>
+            </div>
           </FormField>
         </div>
       </CrudModal>
