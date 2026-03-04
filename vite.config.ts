@@ -22,11 +22,9 @@ export default defineConfig(() => ({
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["react", "react-dom", "lucide-react"],
-    esbuildOptions: {
-      // Garante que o pré-bundle use a mesma referência de React
-      mainFields: ["module", "main"],
-    },
+    include: ["react", "react-dom"],
+    // lucide-react fora do pré-bundle para usar o mesmo React da app (evita forwardRef undefined)
+    exclude: ["lucide-react"],
   },
   build: {
     target: "es2020",
