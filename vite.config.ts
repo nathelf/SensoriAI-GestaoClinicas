@@ -6,7 +6,7 @@ const projectRoot = path.resolve(__dirname);
 const reactPath = path.join(projectRoot, "node_modules/react/index.js");
 const reactDomPath = path.join(projectRoot, "node_modules/react-dom/index.js");
 
-/** Plugin que força qualquer import de "react" ou "react-dom" a usar a cópia do projeto (corrige forwardRef undefined no lucide-react). */
+/** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). No build fica desativado para o deploy não falhar. */
 function forceReactResolution() {
   return {
     name: "force-react-resolution",
@@ -21,7 +21,7 @@ function forceReactResolution() {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+export default defineConfig(({ command }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -29,12 +29,11 @@ export default defineConfig(() => ({
       overlay: false,
     },
   },
-  plugins: [forceReactResolution(), react()],
+  plugins: command === "build" ? [react()] : [forceReactResolution(), react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      react: reactPath,
-      "react-dom": reactDomPath,
+      ...(command === "build" ? {} : { react: reactPath, "react-dom": reactDomPath }),
     },
     dedupe: ["react", "react-dom"],
   },
