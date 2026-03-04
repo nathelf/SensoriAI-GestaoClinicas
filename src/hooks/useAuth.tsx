@@ -76,43 +76,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
         if (session?.user) {
-          try {
-            await ensureUserProfile(session.user);
-          } catch (_) {
-            // upsert pode falhar se RLS não permitir; o trigger já criou o perfil
-          }
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchRole(session.user.id);
-          }, 0);
+          ensureUserProfile(session.user).catch(() => {});
+          fetchProfile(session.user.id);
+          fetchRole(session.user.id);
         } else {
           setProfile(null);
           setUserRole(null);
         }
-        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
       if (session?.user) {
-        try {
-          await ensureUserProfile(session.user);
-        } catch (_) {}
+        ensureUserProfile(session.user).catch(() => {});
         fetchProfile(session.user.id);
         fetchRole(session.user.id);
       }
-      setLoading(false);
     }).catch(() => {
       setLoading(false);
     });
 
-    const safetyTimer = setTimeout(() => setLoading(false), 3000);
+    const safetyTimer = setTimeout(() => setLoading(false), 2000);
 
     return () => {
       subscription.unsubscribe();

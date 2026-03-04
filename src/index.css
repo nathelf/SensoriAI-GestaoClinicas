@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
-
+/* Fonte carregada em index.html de forma não bloqueante */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,7 +21,7 @@
     --secondary-foreground: 220 20% 22%;
 
     --muted: 220 14% 94%;
-    --muted-foreground: 220 10% 46%;
+    --muted-foreground: 220 14% 32%;
 
     --accent: 35 55% 90%;
     --accent-foreground: 30 40% 30%;

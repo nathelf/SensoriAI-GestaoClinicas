@@ -7,7 +7,7 @@ export function LandingFooter() {
       <div className="flex items-center justify-center gap-2 mb-2">
         <SensoriAILogo variant="full" iconClassName="w-5 h-5" />
       </div>
-      <p className="text-muted-foreground text-sm">© 2026 SensoriAI. Desenvolvido para transformar a saúde.</p>
+      <p className="text-foreground/75 text-sm">© 2026 SensoriAI. Desenvolvido para transformar a saúde.</p>
     </footer>
   );
 }

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,78 +6,75 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { AppLayout } from "./components/AppLayout";
-import Dashboard from "./pages/Dashboard";
-import Auth from "./pages/Auth";
-import Landing from "./pages/Landing";
-import Sobre from "./pages/Sobre";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Perfil from "./pages/Perfil";
-import AdminPanel from "./pages/AdminPanel";
-import NovoAtendimento from "./pages/NovoAtendimento";
-import HistoricoProcedimentos from "./pages/HistoricoProcedimentos";
-import GaleriaEvolucao from "./pages/GaleriaEvolucao";
-import Agenda from "./pages/Agenda";
-import AgendaBloqueios from "./pages/AgendaBloqueios";
-import AgendaLinks from "./pages/AgendaLinks";
-import Pacientes from "./pages/Pacientes";
-import CliniDocs from "./pages/CliniDocs";
-import DocumentoAssinatura from "./pages/DocumentoAssinatura";
-import DocumentosConversor from "./pages/DocumentosConversor";
-import AssinarPorToken from "./pages/AssinarPorToken";
-import Comunicacao from "./pages/Comunicacao";
-import Financeiro from "./pages/Financeiro";
-import Vendas from "./pages/Vendas";
-import Comissoes from "./pages/Comissoes";
-import EmAberto from "./pages/comissoes/EmAberto";
-import ComissoesFinalizadas from "./pages/comissoes/Finalizadas";
-import TabelaVendas from "./pages/comissoes/TabelaVendas";
-import TabelaAtendimento from "./pages/comissoes/TabelaAtendimento";
-import RelatorioComissoes from "./pages/comissoes/RelatorioComissoes";
-import Estoque from "./pages/Estoque";
-import EstoquePedidos from "./pages/EstoquePedidos";
-import SensoriAIChat from "./pages/SensoriAIChat";
-import SensoriAIAnalisador from "./pages/SensoriAIAnalisador";
-import SensoriAIConfig from "./pages/SensoriAIConfig";
-import AlertasRetorno from "./pages/AlertasRetorno";
-import PacientesComunicacao from "./pages/PacientesComunicacao";
-import NotFound from "./pages/NotFound";
+import { RouteFallback } from "./components/RouteFallback";
 
-// Financeiro sub-pages
-import ContasReceber from "./pages/financeiro/ContasReceber";
-import ContasPagar from "./pages/financeiro/ContasPagar";
-import ExtratoMovimentacoes from "./pages/financeiro/ExtratoMovimentacoes";
-import RelatorioCompetencia from "./pages/financeiro/RelatorioCompetencia";
-import FluxoCaixaDiario from "./pages/financeiro/FluxoCaixaDiario";
-import FluxoCaixaMensal from "./pages/financeiro/FluxoCaixaMensal";
-import RelatorioCategorias from "./pages/financeiro/RelatorioCategorias";
-import ContasFinanceiras from "./pages/financeiro/ContasFinanceiras";
-import CategoriasContas from "./pages/financeiro/CategoriasContas";
-import MetodosPagamento from "./pages/financeiro/MetodosPagamento";
-import IntegracaoMaquininha from "./pages/financeiro/IntegracaoMaquininha";
+const Landing = lazy(() => import("./pages/Landing"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Sobre = lazy(() => import("./pages/Sobre"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AssinarPorToken = lazy(() => import("./pages/AssinarPorToken"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Contatos sub-pages
-import Profissionais from "./pages/contatos/Profissionais";
-import Fornecedores from "./pages/contatos/Fornecedores";
-import Leads from "./pages/contatos/Leads";
-import TodosContatos from "./pages/contatos/TodosContatos";
-import Aniversariantes from "./pages/contatos/Aniversariantes";
-import Frequencia from "./pages/contatos/Frequencia";
-import MesclarContatos from "./pages/contatos/MesclarContatos";
-import ConvidarColaboradores from "./pages/contatos/ConvidarColaboradores";
-
-// Configurações sub-pages
-import PreferenciasSistema from "./pages/configuracoes/PreferenciasSistema";
-import DadosClinica from "./pages/configuracoes/DadosClinica";
-import Assinatura from "./pages/configuracoes/Assinatura";
-import Procedimentos from "./pages/configuracoes/Procedimentos";
-import CategoriasProcedimentos from "./pages/configuracoes/CategoriasProcedimentos";
-import Pacotes from "./pages/configuracoes/Pacotes";
-import SalasAtendimento from "./pages/configuracoes/SalasAtendimento";
-import FichasAtendimentos from "./pages/configuracoes/FichasAtendimentos";
-import ModelosAtestados from "./pages/configuracoes/ModelosAtestados";
-import Etiquetas from "./pages/configuracoes/Etiquetas";
-import HorariosFuncionamento from "./pages/configuracoes/HorariosFuncionamento";
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Perfil = lazy(() => import("./pages/Perfil"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const NovoAtendimento = lazy(() => import("./pages/NovoAtendimento"));
+const HistoricoProcedimentos = lazy(() => import("./pages/HistoricoProcedimentos"));
+const GaleriaEvolucao = lazy(() => import("./pages/GaleriaEvolucao"));
+const Agenda = lazy(() => import("./pages/Agenda"));
+const AgendaBloqueios = lazy(() => import("./pages/AgendaBloqueios"));
+const AgendaLinks = lazy(() => import("./pages/AgendaLinks"));
+const Pacientes = lazy(() => import("./pages/Pacientes"));
+const CliniDocs = lazy(() => import("./pages/CliniDocs"));
+const DocumentoAssinatura = lazy(() => import("./pages/DocumentoAssinatura"));
+const DocumentosConversor = lazy(() => import("./pages/DocumentosConversor"));
+const Comunicacao = lazy(() => import("./pages/Comunicacao"));
+const PacientesComunicacao = lazy(() => import("./pages/PacientesComunicacao"));
+const Financeiro = lazy(() => import("./pages/Financeiro"));
+const ContasReceber = lazy(() => import("./pages/financeiro/ContasReceber"));
+const ContasPagar = lazy(() => import("./pages/financeiro/ContasPagar"));
+const ExtratoMovimentacoes = lazy(() => import("./pages/financeiro/ExtratoMovimentacoes"));
+const RelatorioCompetencia = lazy(() => import("./pages/financeiro/RelatorioCompetencia"));
+const FluxoCaixaDiario = lazy(() => import("./pages/financeiro/FluxoCaixaDiario"));
+const FluxoCaixaMensal = lazy(() => import("./pages/financeiro/FluxoCaixaMensal"));
+const RelatorioCategorias = lazy(() => import("./pages/financeiro/RelatorioCategorias"));
+const ContasFinanceiras = lazy(() => import("./pages/financeiro/ContasFinanceiras"));
+const CategoriasContas = lazy(() => import("./pages/financeiro/CategoriasContas"));
+const MetodosPagamento = lazy(() => import("./pages/financeiro/MetodosPagamento"));
+const IntegracaoMaquininha = lazy(() => import("./pages/financeiro/IntegracaoMaquininha"));
+const Vendas = lazy(() => import("./pages/Vendas"));
+const Comissoes = lazy(() => import("./pages/Comissoes"));
+const EmAberto = lazy(() => import("./pages/comissoes/EmAberto"));
+const ComissoesFinalizadas = lazy(() => import("./pages/comissoes/Finalizadas"));
+const TabelaVendas = lazy(() => import("./pages/comissoes/TabelaVendas"));
+const TabelaAtendimento = lazy(() => import("./pages/comissoes/TabelaAtendimento"));
+const RelatorioComissoes = lazy(() => import("./pages/comissoes/RelatorioComissoes"));
+const Estoque = lazy(() => import("./pages/Estoque"));
+const EstoquePedidos = lazy(() => import("./pages/EstoquePedidos"));
+const SensoriAIChat = lazy(() => import("./pages/SensoriAIChat"));
+const SensoriAIAnalisador = lazy(() => import("./pages/SensoriAIAnalisador"));
+const SensoriAIConfig = lazy(() => import("./pages/SensoriAIConfig"));
+const AlertasRetorno = lazy(() => import("./pages/AlertasRetorno"));
+const Profissionais = lazy(() => import("./pages/contatos/Profissionais"));
+const Fornecedores = lazy(() => import("./pages/contatos/Fornecedores"));
+const Leads = lazy(() => import("./pages/contatos/Leads"));
+const TodosContatos = lazy(() => import("./pages/contatos/TodosContatos"));
+const Aniversariantes = lazy(() => import("./pages/contatos/Aniversariantes"));
+const Frequencia = lazy(() => import("./pages/contatos/Frequencia"));
+const MesclarContatos = lazy(() => import("./pages/contatos/MesclarContatos"));
+const ConvidarColaboradores = lazy(() => import("./pages/contatos/ConvidarColaboradores"));
+const PreferenciasSistema = lazy(() => import("./pages/configuracoes/PreferenciasSistema"));
+const DadosClinica = lazy(() => import("./pages/configuracoes/DadosClinica"));
+const Assinatura = lazy(() => import("./pages/configuracoes/Assinatura"));
+const Procedimentos = lazy(() => import("./pages/configuracoes/Procedimentos"));
+const CategoriasProcedimentos = lazy(() => import("./pages/configuracoes/CategoriasProcedimentos"));
+const Pacotes = lazy(() => import("./pages/configuracoes/Pacotes"));
+const SalasAtendimento = lazy(() => import("./pages/configuracoes/SalasAtendimento"));
+const FichasAtendimentos = lazy(() => import("./pages/configuracoes/FichasAtendimentos"));
+const ModelosAtestados = lazy(() => import("./pages/configuracoes/ModelosAtestados"));
+const Etiquetas = lazy(() => import("./pages/configuracoes/Etiquetas"));
+const HorariosFuncionamento = lazy(() => import("./pages/configuracoes/HorariosFuncionamento"));
 
 const queryClient = new QueryClient();
 
@@ -87,9 +85,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
             <Route path="/sobre" element={<Sobre />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -166,7 +165,8 @@ const App = () => (
               <Route path="/configuracoes/horarios" element={<HorariosFuncionamento />} />
             </Route>
             <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

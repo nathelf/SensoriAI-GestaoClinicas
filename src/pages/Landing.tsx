@@ -279,18 +279,18 @@ export default function Landing() {
         scrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-sm py-3" : "bg-transparent border-transparent py-5"
       )}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="SensoriAI - Voltar à página inicial">
             <SensoriAILogo variant="full" iconClassName="w-10 h-10" className="group-hover:opacity-90 transition-opacity" />
           </Link>
-          <nav className="hidden md:flex items-center gap-8">
-            <Link to="/sobre" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Como trabalhamos</Link>
-            <a href="#plataforma" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Recursos Personalizados</a>
-            <a href="#relatorios" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Relatórios em Blocos</a>
-            <a href="#suporte" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Suporte</a>
+          <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
+            <Link to="/sobre" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">Como trabalhamos</Link>
+            <a href="#plataforma" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Recursos personalizados">Recursos Personalizados</a>
+            <a href="#relatorios" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Relatórios em blocos">Relatórios em Blocos</a>
+            <a href="#suporte" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Suporte">Suporte</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link to="/auth"><Button variant="ghost" className="hidden sm:inline-flex font-medium">Entrar</Button></Link>
-            <Link to="/auth">
+            <Link to="/auth" aria-label="Entrar na sua conta"><Button variant="ghost" className="hidden sm:inline-flex font-medium">Entrar</Button></Link>
+            <Link to="/auth" aria-label="Começar teste grátis">
               <Button className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 gap-2 px-6 relative overflow-hidden group">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                 Teste Grátis <ArrowRight className="w-4 h-4" />
@@ -372,7 +372,7 @@ export default function Landing() {
                   <Rocket className="w-4 h-4" /> Iniciar gratuitamente
                 </motion.span>
               </Link>
-              <a href="#relatorios" className="w-full sm:w-auto order-1 sm:order-2">
+              <a href="#relatorios" className="w-full sm:w-auto order-1 sm:order-2" aria-label="Ver demonstração dos relatórios em blocos">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-8 rounded-full border-foreground/30 bg-foreground/5 hover:bg-foreground/10 text-foreground gap-2.5 font-semibold">
                   Ver demonstração <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -640,7 +640,7 @@ export default function Landing() {
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Junte-se às clínicas que estão automatizando processos e focando no que importa: o paciente.
           </p>
-          <Link to="/auth">
+          <Link to="/auth" aria-label="Criar conta gratuita na SensoriAI">
             <Button size="lg" className="h-16 px-12 text-lg rounded-full shadow-2xl shadow-primary/40 hover:scale-105 hover:shadow-primary/60 transition-all duration-300 gap-3">
               Criar conta gratuita agora <ArrowRight className="w-5 h-5" />
             </Button>

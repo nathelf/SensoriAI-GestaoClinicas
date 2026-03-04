@@ -81,9 +81,6 @@ export default function Auth() {
         const { data, error } = await Promise.race([signInPromise, timeoutPromise]);
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
-        if (data?.session) {
-          await new Promise((r) => setTimeout(r, 150));
-        }
         navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
@@ -317,7 +314,12 @@ export default function Auth() {
                     },
                   });
                   if (error) {
-                    toast.error(error.message || "Erro ao entrar com Google");
+                    const msg = error.message || "";
+                    if (msg.includes("provider is not enabled") || msg.includes("Unsupported provider")) {
+                      toast.error("Login com Google não está ativo. No Supabase: Authentication → Providers → ative o Google e configure Client ID e Secret.");
+                    } else {
+                      toast.error(msg || "Erro ao entrar com Google");
+                    }
                     return;
                   }
                   if (data?.url) {
