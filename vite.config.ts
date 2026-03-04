@@ -2,6 +2,22 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
+/** Carrega o CSS principal de forma não bloqueante (melhora FCP/LCP). */
+function deferMainCss() {
+  return {
+    name: "defer-main-css",
+    transformIndexHtml(html: string) {
+      return html.replace(
+        /<link(\s[^>]*?href="[^"]*index[^"]*\.css"[^>]*)>/i,
+        (match) => {
+          if (match.includes('media="print"')) return match;
+          return match.replace(/^<link/, '<link media="print" onload="this.media=\'all\'"');
+        }
+      );
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
@@ -11,7 +27,7 @@ export default defineConfig({
       overlay: false,
     },
   },
-  plugins: [react()],
+  plugins: [react(), deferMainCss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -26,6 +42,8 @@ export default defineConfig({
         manualChunks: (id) => {
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
+          if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/jszip") || id.includes("node_modules/canvg")) return "pdf";
+          if (id.includes("node_modules/react-quill") || id.includes("node_modules/quill")) return "quill";
           if (id.includes("node_modules")) return "vendor";
         },
         chunkFileNames: "assets/[name]-[hash].js",

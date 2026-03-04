@@ -7,8 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import {
     ReactFlow,
@@ -201,6 +199,10 @@ function RelatoriosPersonalizadosContent() {
         // Um pequeno timeout para renderizar as alterações visuais de Header e Nós
         setTimeout(async () => {
             try {
+                const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+                    import('html2canvas'),
+                    import('jspdf'),
+                ]);
                 const flowElement = reactFlowWrapper.current?.querySelector('.react-flow__pane') as HTMLElement || reactFlowWrapper.current;
                 const canvas = await html2canvas(flowElement, {
                     scale: 2,

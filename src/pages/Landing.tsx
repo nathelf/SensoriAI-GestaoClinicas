@@ -1,3 +1,4 @@
+import "./Landing.css";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useSpring } from "framer-motion";
@@ -132,14 +133,26 @@ function RelatoriosDemo() {
   const showLine = (isDragging && dragPos) || connected;
   const canDraw = showLine && lineStart && lineEnd;
 
+  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10";
+
   return (
-    <div ref={containerRef} className="lg:col-span-3 relative h-[450px] rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-hidden cursor-auto">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px]" />
+    <div
+      ref={containerRef}
+      className={cn(
+        "lg:col-span-3 rounded-2xl bg-[#F8F9FB] dark:bg-muted/10 border border-border overflow-x-hidden cursor-auto",
+        "min-h-[380px] sm:min-h-[450px]",
+        "flex flex-col items-center justify-center p-6 lg:p-0 lg:relative lg:h-[450px]"
+      )}
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" aria-hidden />
       {!connected && !isDragging && (
-        <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20">Arraste do ponto roxo até o outro bloco para conectar</p>
+        <p className="lg:absolute lg:bottom-4 lg:left-1/2 lg:-translate-x-1/2 text-xs sm:text-sm text-muted-foreground z-20 px-4 text-center mt-4 lg:mt-0">
+          <span className="lg:hidden">Na plataforma, conecte blocos arrastando.</span>
+          <span className="hidden lg:inline">Arraste do ponto roxo até o outro bloco para conectar</span>
+        </p>
       )}
       {canDraw && (
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" style={{ overflow: "visible" }} aria-hidden>
           <path
             d={`M ${lineStart.x} ${lineStart.y} C ${lineStart.x + 60} ${lineStart.y}, ${lineEnd.x - 60} ${lineEnd.y}, ${lineEnd.x} ${lineEnd.y}`}
             stroke="#a855f7"
@@ -150,42 +163,104 @@ function RelatoriosDemo() {
           />
         </svg>
       )}
-      <div className="absolute top-12 left-10 w-72 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border p-4 z-10">
-        <div className="flex items-center gap-3 mb-4">
-          <Stethoscope className="w-5 h-5 text-purple-600" />
-          <span className="font-semibold text-foreground">Histórico do Paciente</span>
+      {/* Mobile: blocos em coluna */}
+      <div className="flex flex-col items-center gap-0 w-full max-w-[20rem] mx-auto lg:hidden">
+        <div className={cn("relative w-full", cardCls)}>
+          <div className="flex items-center gap-3 mb-4">
+            <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
+            <span className="font-semibold text-foreground text-sm sm:text-base">Histórico do Paciente</span>
+          </div>
+          <div className="space-y-2.5">
+            <div className="h-2 w-full bg-muted/60 rounded-full" />
+            <div className="h-2 w-2/3 bg-muted/60 rounded-full" />
+          </div>
         </div>
-        <div className="space-y-2.5">
-          <div className="h-2 w-full bg-muted/60 rounded-full" />
-          <div className="h-2 w-2/3 bg-muted/60 rounded-full" />
+        <div className="flex flex-col items-center gap-2 py-3">
+          <div className="w-0.5 h-4 bg-primary/40 rounded-full" aria-hidden />
+          {!connected ? (
+            <button
+              type="button"
+              onClick={() => setConnected(true)}
+              className="text-xs font-medium text-primary hover:text-primary/80 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 transition-colors active:scale-95"
+            >
+              Toque para conectar
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 text-primary">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-xs font-medium">Conectado</span>
+            </div>
+          )}
+          <div className="w-0.5 h-4 bg-primary/40 rounded-full" aria-hidden />
         </div>
-        <div
-          ref={sourceDotRef}
-          role="button"
-          tabIndex={0}
-          onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
-          className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
-          aria-label="Arraste até o bloco Resumo com IA para conectar"
-        />
+        <div className={cn("relative w-full", cardCls)}>
+          <div className="flex items-center gap-3 mb-4">
+            <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
+          </div>
+          <div className="space-y-2.5">
+            <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+            <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+            <div className="h-2 w-1/2 bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+          </div>
+          {connected && (
+            <p className="mt-3 text-xs sm:text-sm text-primary font-medium leading-snug">Conectado. É assim que você liga os blocos na plataforma.</p>
+          )}
+        </div>
       </div>
-      <div className="absolute bottom-16 right-10 w-72 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-border p-4 z-10">
-        <div
-          ref={targetDotRef}
-          className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
-          aria-hidden
-        />
-        <div className="flex items-center gap-3 mb-4">
-          <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
-        </div>
-        <div className="space-y-2.5">
-          <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
-          <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
-          <div className="h-2 w-1/2 bg-purple-100 dark:bg-purple-900/30 rounded-full" />
-        </div>
-        {connected && (
-          <p className="mt-3 text-sm text-primary font-medium">Conectado. É assim que você liga os blocos na plataforma.</p>
+      {/* Desktop: layout original com drag-and-drop */}
+      <div className="hidden lg:block relative w-full h-full min-h-[450px]">
+        {!connected && !isDragging && (
+          <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground z-20 px-4 text-center">Arraste do ponto roxo até o outro bloco para conectar</p>
         )}
+        {canDraw && (
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
+            <path
+              d={`M ${lineStart.x} ${lineStart.y} C ${lineStart.x + 60} ${lineStart.y}, ${lineEnd.x - 60} ${lineEnd.y}, ${lineEnd.x} ${lineEnd.y}`}
+              stroke="#a855f7"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={connected ? "0" : "6 6"}
+            />
+          </svg>
+        )}
+        <div className={cn("absolute top-6 sm:top-12 left-4 sm:left-10", cardCls)}>
+          <div className="flex items-center gap-3 mb-4">
+            <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
+            <span className="font-semibold text-foreground text-sm sm:text-base truncate">Histórico do Paciente</span>
+          </div>
+          <div className="space-y-2.5">
+            <div className="h-2 w-full bg-muted/60 rounded-full" />
+            <div className="h-2 w-2/3 bg-muted/60 rounded-full" />
+          </div>
+          <div
+            ref={sourceDotRef}
+            role="button"
+            tabIndex={0}
+            onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
+            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
+            aria-label="Arraste até o bloco Resumo com IA para conectar"
+          />
+        </div>
+        <div className={cn("absolute bottom-14 sm:bottom-16 right-4 sm:right-10", cardCls)}>
+          <div
+            ref={targetDotRef}
+            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
+            aria-hidden
+          />
+          <div className="flex items-center gap-3 mb-4">
+            <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
+          </div>
+          <div className="space-y-2.5">
+            <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+            <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+            <div className="h-2 w-1/2 bg-purple-100 dark:bg-purple-900/30 rounded-full" />
+          </div>
+          {connected && (
+            <p className="mt-3 text-xs sm:text-sm text-primary font-medium leading-snug">Conectado. É assim que você liga os blocos na plataforma.</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -278,22 +353,24 @@ export default function Landing() {
         "fixed top-0 w-full z-50 transition-all duration-500 border-b",
         scrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-sm py-3" : "bg-transparent border-transparent py-5"
       )}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group" aria-label="SensoriAI - Voltar à página inicial">
-            <SensoriAILogo variant="full" iconClassName="w-10 h-10" className="group-hover:opacity-90 transition-opacity" />
+        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 flex items-center justify-between gap-3 min-w-0">
+          <Link to="/" className="flex items-center gap-2.5 group shrink-0" aria-label="SensoriAI - Voltar à página inicial">
+            <SensoriAILogo variant="full" iconClassName="w-8 h-8 sm:w-10 sm:h-10" className="group-hover:opacity-90 transition-opacity" />
           </Link>
-          <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
+          <nav className="hidden md:flex items-center gap-8 shrink-0" aria-label="Navegação principal">
             <Link to="/sobre" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">Como trabalhamos</Link>
             <a href="#plataforma" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Recursos personalizados">Recursos Personalizados</a>
             <a href="#relatorios" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Relatórios em blocos">Relatórios em Blocos</a>
             <a href="#suporte" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors" aria-label="Ir para seção Suporte">Suporte</a>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
             <Link to="/auth" aria-label="Entrar na sua conta"><Button variant="ghost" className="hidden sm:inline-flex font-medium">Entrar</Button></Link>
-            <Link to="/auth" aria-label="Começar teste grátis">
-              <Button className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 gap-2 px-6 relative overflow-hidden group">
+            <Link to="/auth" aria-label="Começar teste grátis" className="shrink-0">
+              <Button className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 gap-1.5 sm:gap-2 px-4 sm:px-6 text-sm sm:text-base relative overflow-hidden group whitespace-nowrap">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                Teste Grátis <ArrowRight className="w-4 h-4" />
+                <span className="max-[360px]:hidden">Teste Grátis</span>
+                <span className="min-[361px]:hidden">Teste grátis</span>
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             </Link>
           </div>
@@ -303,7 +380,7 @@ export default function Landing() {
       <main className="relative z-10 flex-1 pt-24">
         {/* --- Hero Section --- */}
         <section
-          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-0 sm:pt-4 lg:pt-6 px-4 sm:px-6 lg:px-8 overflow-visible"
+          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-0 sm:pt-4 lg:pt-6 px-6 sm:px-6 lg:px-8 overflow-x-hidden overflow-y-visible"
           onMouseMove={handleMouseMove}
         >
 
@@ -337,7 +414,7 @@ export default function Landing() {
             </motion.div>
           </div>
 
-          <div className="max-w-5xl mx-auto text-center relative z-10 mt-2 sm:mt-4">
+          <div className="w-full max-w-5xl mx-auto text-center relative z-10 mt-2 sm:mt-4 px-0">
             {/* Banner */}
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, type: "spring" }} className="inline-flex items-center gap-2.5 rounded-full bg-foreground/10 dark:bg-foreground/5 border border-border/50 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-foreground mb-8 shadow-sm cursor-default">
               <span className="relative flex h-2 w-2">
@@ -348,7 +425,7 @@ export default function Landing() {
             </motion.div>
 
             {/* Título principal */}
-            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
+            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
               <motion.span variants={fadeUp} className="block">Sua clínica.</motion.span>
               <motion.span
                 variants={fadeUp}
@@ -359,7 +436,7 @@ export default function Landing() {
               <motion.span variants={fadeUp} className="block mt-2">Seu futuro.</motion.span>
             </motion.h1>
 
-            <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+            <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-base sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
               Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">Arraste blocos, conecte dados</strong> e crie uma plataforma gerencial desenhada para o seu fluxo com IA nativa. <strong className="font-semibold text-foreground">Modelo customizado</strong> para o que sua clínica precisa.
             </motion.p>
 
@@ -423,27 +500,27 @@ export default function Landing() {
         </section>
 
         {/* --- Destaque: Relatórios Drag & Drop --- */}
-        <section id="relatorios" className="py-32 relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
-              <p className="mt-4 text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
+        <section id="relatorios" className="py-32 relative overflow-x-hidden">
+          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">Relatórios que você <span className="text-primary">desenha</span></h2>
+              <p className="mt-4 text-base sm:text-xl text-muted-foreground">Conecte fontes de dados visualmente e gere insights com arrastar e soltar.</p>
             </div>
 
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
-              className="relative rounded-[2rem] overflow-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-8 lg:p-12 shadow-2xl"
+              className="relative rounded-2xl sm:rounded-[2rem] overflow-x-hidden border border-border/60 bg-white/50 dark:bg-card/40 backdrop-blur-3xl p-6 sm:p-8 lg:p-12 shadow-2xl"
             >
-              <div className="grid lg:grid-cols-5 gap-12 items-center relative z-10">
-                <div className="lg:col-span-2 space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center relative z-10">
+                <div className="lg:col-span-2 space-y-6 lg:space-y-8 order-2 lg:order-1">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-600 mb-2">
                     <Workflow className="w-7 h-7" />
                   </div>
-                  <h3 className="text-3xl font-bold text-foreground leading-tight">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
                     Conecte blocos e deixe a IA gerar o relatório.
                   </h3>
-                  <p className="text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
-                  <ul className="space-y-5">
+                  <p className="text-sm sm:text-base text-muted-foreground">Arraste do ponto roxo abaixo para ligar os blocos e ver como funciona.</p>
+                  <ul className="space-y-6 sm:space-y-7">
                     {[
                       "Vincule Histórico do Paciente à nossa IA para enriquecer relatórios.",
                       "Resumos narrativos em PDF em um clique.",
@@ -453,20 +530,22 @@ export default function Landing() {
                         <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-4 h-4 text-primary" />
                         </div>
-                        <span className="text-lg text-foreground/80 font-medium">{text}</span>
+                        <span className="text-base sm:text-lg text-foreground/80 font-medium leading-snug">{text}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <RelatoriosDemo />
+                <div className="order-1 lg:order-2 min-w-0">
+                  <RelatoriosDemo />
+                </div>
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* --- Recursos / O que sua clínica ganha --- */}
-        <section id="plataforma" className="py-24 bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="plataforma" className="py-24 bg-background overflow-x-hidden">
+          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-foreground tracking-tight">
                 O que sua clínica ganha na prática
@@ -512,8 +591,8 @@ export default function Landing() {
         </section>
 
         {/* --- SEÇÃO SUPORTE (Focado em IA Humanizada) --- */}
-        <section id="suporte" className="py-32 bg-primary/5 border-y border-border/50 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <section id="suporte" className="py-32 bg-primary/5 border-y border-border/50 relative overflow-x-hidden">
+          <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 relative z-10">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
                 <motion.div initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", bounce: 0.5 }} className="inline-flex w-16 h-16 rounded-full bg-white dark:bg-card shadow-md items-center justify-center mb-8 p-2">
@@ -635,7 +714,7 @@ export default function Landing() {
         </section>
 
         {/* --- CTA Final --- */}
-        <section className="pt-32 pb-12 relative text-center px-4">
+        <section className="pt-32 pb-12 relative text-center px-6 overflow-x-hidden">
           <h2 className="text-5xl font-black text-foreground mb-6">Pronto para a evolução?</h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Junte-se às clínicas que estão automatizando processos e focando no que importa: o paciente.

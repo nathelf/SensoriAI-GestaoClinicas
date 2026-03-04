@@ -1,6 +1,4 @@
-import { useMemo } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { useMemo, useState, useEffect } from "react";
 
 interface EditorWysiwygProps {
   value: string;
@@ -17,6 +15,21 @@ export function EditorWysiwyg({
   className = "",
   minHeight = "200px",
 }: EditorWysiwygProps) {
+  const [QuillComponent, setQuillComponent] = useState<React.ComponentType<any> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      import("react-quill").then((m) => m.default),
+      import("react-quill/dist/quill.snow.css"),
+    ]).then(([ReactQuill]) => {
+      if (!cancelled) setQuillComponent(() => ReactQuill);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const modules = useMemo(
     () => ({
       toolbar: [
@@ -39,6 +52,19 @@ export function EditorWysiwyg({
     "blockquote", "link",
   ];
 
+  if (!QuillComponent) {
+    return (
+      <div className={className}>
+        <div
+          className="flex items-center justify-center rounded-xl border border-border/60 bg-muted/30 text-muted-foreground text-sm"
+          style={{ minHeight }}
+        >
+          Carregando editor…
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
       <style>{`
@@ -52,7 +78,7 @@ export function EditorWysiwyg({
         .editor-wysiwyg .ql-toolbar .ql-picker-label.ql-active { color: #9b87f5; }
       `}</style>
       <div className="editor-wysiwyg">
-        <ReactQuill
+        <QuillComponent
           theme="snow"
           value={value}
           onChange={onChange}

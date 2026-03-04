@@ -1,5 +1,4 @@
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import type { jsPDF } from "jspdf";
 
 export interface DadosSeguranca {
   nome: string;
@@ -29,7 +28,11 @@ export async function gerarPdfAssinado(
   assinaturaBase64: string,
   dadosSeguranca: DadosSeguranca
 ): Promise<jsPDF> {
-  const doc = new jsPDF("p", "mm", "a4");
+  const [{ jsPDF: JsPDF }, { default: html2canvas }] = await Promise.all([
+    import("jspdf"),
+    import("html2canvas"),
+  ]);
+  const doc = new JsPDF("p", "mm", "a4");
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 10;
@@ -101,7 +104,11 @@ export async function gerarPdfAssinado(
 /**
  * Gera PDF rascunho (apenas conteúdo) a partir de HTML. Usa um elemento temporário para html2canvas.
  */
-export async function gerarPdfRascunho(htmlContent: string, titulo: string): Promise<jsPDF> {
+export async function gerarPdfRascunho(htmlContent: string, _titulo: string): Promise<jsPDF> {
+  const [{ jsPDF: JsPDF }, { default: html2canvas }] = await Promise.all([
+    import("jspdf"),
+    import("html2canvas"),
+  ]);
   const temp = document.createElement("div");
   temp.innerHTML = htmlContent || "<p>Sem conteúdo.</p>";
   temp.style.position = "fixed";
@@ -122,7 +129,7 @@ export async function gerarPdfRascunho(htmlContent: string, titulo: string): Pro
     });
     document.body.removeChild(temp);
 
-    const doc = new jsPDF("p", "mm", "a4");
+    const doc = new JsPDF("p", "mm", "a4");
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
     const margin = 10;
