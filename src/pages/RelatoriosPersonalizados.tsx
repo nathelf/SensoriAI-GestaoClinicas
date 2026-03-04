@@ -35,6 +35,7 @@ import { TableNode } from '@/components/canvas/TableNode';
 import { AINode } from '@/components/canvas/AINode';
 import { GenericNode } from '@/components/canvas/GenericNode';
 import { CanvasSidebar } from '@/components/canvas/CanvasSidebar';
+import { PASTEL_PALETTE } from '@/components/canvas/canvasStyles';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -77,18 +78,18 @@ function RelatoriosPersonalizadosContent() {
 
     const onConnect: OnConnect = useCallback(
         (params: Connection | Edge) => {
-            // Cores Pasteis Coloridas
-            const pastelColors = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#CDB4DB', '#FFC8DD', '#FFAFCC', '#BDE0FE', '#A2D2FF'];
-            const randomColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+            setEdges((eds) => {
+                // Cada nova conexão recebe a próxima cor da paleta pastel (variando por bloco)
+                const index = eds.length % PASTEL_PALETTE.length;
+                const strokeColor = PASTEL_PALETTE[index];
 
-            // Customizando o estilo do fio de conexão para tons pasteis
-            const animatedEdge = {
-                ...params,
-                animated: true,
-                style: { stroke: randomColor, strokeWidth: 3 }, // Cor Aleatória Pastel
-            };
-
-            setEdges((eds) => addEdge(animatedEdge, eds));
+                const animatedEdge = {
+                    ...params,
+                    animated: true,
+                    style: { stroke: strokeColor, strokeWidth: 5 },
+                };
+                return addEdge(animatedEdge, eds);
+            });
 
             // Se conectou ao nó de IA (target), atualizar o estado desse nó para habilitar o botão
             if (params.target) {

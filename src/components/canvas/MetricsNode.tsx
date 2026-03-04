@@ -1,16 +1,16 @@
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { NodeProps } from '@xyflow/react';
 import { LayoutDashboard } from 'lucide-react';
+import { NodeHandle } from './NodeHandle';
 
 export function MetricsNode({ data }: NodeProps) {
     const isPdfMode = !!data.isPdfMode;
-    const handleClasses = "w-3 h-3 bg-[#CDB4DB] border-2 border-background shadow-sm hover:w-4 hover:h-4 hover:bg-[#E6B3FF] transition-all";
 
     return (
         <div className={`bg-card border border-border/60 rounded-2xl shadow-sm min-w-[250px] p-6 relative ${isPdfMode ? '' : 'hover:shadow-md transition-shadow'}`}>
-            <Handle type="source" position={Position.Top} id="top" className={handleClasses} />
-            <Handle type="source" position={Position.Right} id="right" className={handleClasses} />
-            <Handle type="source" position={Position.Bottom} id="bottom" className={handleClasses} />
-            <Handle type="source" position={Position.Left} id="left" className={handleClasses} />
+            <NodeHandle position="top" />
+            <NodeHandle position="right" />
+            <NodeHandle position="bottom" />
+            <NodeHandle position="left" />
 
             <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">

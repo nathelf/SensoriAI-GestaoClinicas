@@ -1,6 +1,7 @@
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { NodeProps } from '@xyflow/react';
 import { BrainCircuit, Sparkles, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NodeHandle } from './NodeHandle';
 
 export function AINode({ data }: NodeProps) {
     const isPdfMode = !!data.isPdfMode;
@@ -8,16 +9,14 @@ export function AINode({ data }: NodeProps) {
     const isGenerating = !!data.isGenerating;
     const content = data.content as string;
 
-    const handleClasses = `w-4 h-4 rounded-full border-2 border-background shadow-sm transition-all hover:scale-125 ${isConnected ? 'bg-[#E6B3FF]' : 'bg-[#FFC8DD] animate-pulse'}`;
-
     return (
         <div className={`bg-gradient-to-br from-primary/5 to-purple-500/5 p-6 rounded-2xl border ${isConnected ? 'border-primary/50 shadow-md ring-2 ring-primary/20' : 'border-primary/20'} min-w-[350px] max-w-[400px] relative ${isPdfMode ? '' : 'transition-all'}`}>
 
-            {/* Target Handles - 4 lados da IA */}
-            <Handle type="target" position={Position.Top} id="top" className={handleClasses} />
-            <Handle type="target" position={Position.Right} id="right" className={handleClasses} />
-            <Handle type="target" position={Position.Bottom} id="bottom" className={handleClasses} />
-            <Handle type="target" position={Position.Left} id="left" className={handleClasses} />
+            {/* Handles nos 4 lados: área grande para a linha grudar na bolinha */}
+            <NodeHandle position="top" />
+            <NodeHandle position="right" />
+            <NodeHandle position="bottom" />
+            <NodeHandle position="left" />
 
             <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm border border-border/50 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-primary shadow-sm flex items-center gap-1">
                 <Sparkles size={10} /> SensoriAI Verified
