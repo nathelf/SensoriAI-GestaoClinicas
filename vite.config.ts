@@ -2,42 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-const projectRoot = path.resolve(__dirname);
-const reactDir = path.join(projectRoot, "node_modules/react");
-const reactDomDir = path.join(projectRoot, "node_modules/react-dom");
-const reactJsxRuntime = path.join(reactDir, "jsx-runtime.js");
-const reactJsxDevRuntime = path.join(reactDir, "jsx-dev-runtime.js");
-
-/** No build: resolve jsx-runtime antes de qualquer outro plugin (evita react/index.js/jsx-runtime na Vercel). */
-function fixReactJsxResolution() {
-  return {
-    name: "fix-react-jsx-resolution",
-    enforce: "pre" as const,
-    resolveId(id: string) {
-      if (id === "react/jsx-runtime") return reactJsxRuntime;
-      if (id === "react/jsx-dev-runtime") return reactJsxDevRuntime;
-      return null;
-    },
-  };
-}
-
-/** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). */
-function forceReactResolution() {
-  return {
-    name: "force-react-resolution",
-    enforce: "pre" as const,
-    resolveId(id: string) {
-      if (id === "react") return path.join(reactDir, "index.js");
-      if (id === "react-dom") return path.join(reactDomDir, "index.js");
-      if (id === "react/jsx-runtime") return reactJsxRuntime;
-      if (id === "react/jsx-dev-runtime") return reactJsxDevRuntime;
-      return null;
-    },
-  };
-}
-
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   server: {
     host: "::",
     port: 8080,
@@ -45,31 +11,11 @@ export default defineConfig(({ command }) => ({
       overlay: false,
     },
   },
-  plugins:
-    command === "build"
-      ? [fixReactJsxResolution(), react()]
-      : [forceReactResolution(), react()],
+  plugins: [react()],
   resolve: {
-    alias: [
-      { find: /^react\/jsx-runtime$/, replacement: reactJsxRuntime },
-      { find: /^react\/jsx-dev-runtime$/, replacement: reactJsxDevRuntime },
-      { find: "@", replacement: path.resolve(__dirname, "./src") },
-      // React: em dev aponta para index.js (forwardRef/lucide); em build para a pasta (evita index.js/jsx-runtime e garante createContext)
-      ...(command === "build"
-        ? [
-            { find: /^react$/, replacement: reactDir },
-            { find: /^react-dom$/, replacement: reactDomDir },
-          ]
-        : [
-            { find: /^react$/, replacement: path.join(reactDir, "index.js") },
-            { find: /^react-dom$/, replacement: path.join(reactDomDir, "index.js") },
-          ]),
-    ],
-    dedupe: ["react", "react-dom"],
-  },
-  optimizeDeps: {
-    include: ["react", "react-dom"],
-    exclude: ["lucide-react"],
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   build: {
     target: "es2020",
@@ -78,13 +24,6 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React/react-dom/lucide sem nome → ficam no chunk do entry (evita createContext/forwardRef undefined)
-          if (
-            id.includes("node_modules/react") ||
-            id.includes("node_modules/react-dom") ||
-            id.includes("node_modules/lucide-react")
-          )
-            return undefined;
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules")) return "vendor";
@@ -96,4 +35,4 @@ export default defineConfig(({ command }) => ({
     },
     reportCompressedSize: true,
   },
-}));
+});
