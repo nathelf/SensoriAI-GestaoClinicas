@@ -3,9 +3,10 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 const projectRoot = path.resolve(__dirname);
-// Alias para a pasta do pacote (não para index.js), senão "react/jsx-runtime" vira ".../react/index.js/jsx-runtime" e quebra
 const reactDir = path.join(projectRoot, "node_modules/react");
 const reactDomDir = path.join(projectRoot, "node_modules/react-dom");
+const reactJsxRuntime = path.join(reactDir, "jsx-runtime.js");
+const reactJsxDevRuntime = path.join(reactDir, "jsx-dev-runtime.js");
 
 /** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). */
 function forceReactResolution() {
@@ -33,13 +34,18 @@ export default defineConfig(({ command }) => ({
   },
   plugins: command === "build" ? [react()] : [forceReactResolution(), react()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      // Só em dev: alias para corrigir forwardRef no lucide-react. No build não usar para não quebrar react/jsx-runtime.
+    alias: [
+      { find: /^react\/jsx-runtime$/, replacement: reactJsxRuntime },
+      { find: /^react\/jsx-dev-runtime$/, replacement: reactJsxDevRuntime },
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+      // Só em dev: alias react/react-dom para corrigir forwardRef no lucide-react
       ...(command === "build"
-        ? {}
-        : { react: reactDir, "react-dom": reactDomDir }),
-    },
+        ? []
+        : [
+            { find: /^react$/, replacement: path.join(reactDir, "index.js") },
+            { find: /^react-dom$/, replacement: path.join(reactDomDir, "index.js") },
+          ]),
+    ],
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
