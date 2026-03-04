@@ -71,10 +71,12 @@ export default function Auth() {
     setLoading(true);
     try {
       if (isLogin) {
-        const timeoutMs = 15000;
+        const timeoutMs = 20000;
         const signInPromise = supabase.auth.signInWithPassword({ email, password });
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Tempo esgotado. Verifique sua conexão e se a URL do Supabase está correta (VITE_SUPABASE_URL).")), timeoutMs)
+          setTimeout(() => reject(new Error(
+            "Tempo esgotado. Confira: 1) .env com VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY 2) A chave deve ser a 'anon' (public) do Supabase: Dashboard do projeto → Settings → API → anon public (JWT que começa com eyJ). 3) Projeto não pausado."
+          )), timeoutMs)
         );
         const { data, error } = await Promise.race([signInPromise, timeoutPromise]);
         if (error) throw error;
