@@ -33,7 +33,8 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      ...(command === "build" ? {} : { react: reactPath, "react-dom": reactDomPath }),
+      react: reactPath,
+      "react-dom": reactDomPath,
     },
     dedupe: ["react", "react-dom"],
   },
@@ -49,6 +50,8 @@ export default defineConfig(({ command }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) return "react";
+          // lucide-react no mesmo chunk que React para evitar "forwardRef undefined" em produção
+          if (id.includes("node_modules/lucide-react")) return "react";
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules")) return "vendor";
