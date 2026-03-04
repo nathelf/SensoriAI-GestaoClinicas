@@ -35,7 +35,12 @@ Se aparecer tela em branco ou erro no console (ex.: `forwardRef`), o mesmo tende
 
 ---
 
-## 4. Possíveis erros depois do deploy
+## 4. Se o build falhar na Vercel (ex.: react/jsx-runtime)
+No painel do projeto na Vercel: **Settings → General**. No final da página, em **Redeploy**, marque **"Redeploy with 'Clean Cache'"** e faça um novo deploy. A Vercel às vezes reutiliza dependências em cache e isso pode causar resolução errada de módulos.
+
+---
+
+## 5. Possíveis erros depois do deploy
 
 | Problema | O que verificar |
 |----------|------------------|
@@ -46,5 +51,5 @@ Se aparecer tela em branco ou erro no console (ex.: `forwardRef`), o mesmo tende
 
 ---
 
-## 5. vercel.json
+## 6. vercel.json
 Já está ok: `buildCommand`, `outputDirectory: "dist"`, `rewrites` para SPA.
