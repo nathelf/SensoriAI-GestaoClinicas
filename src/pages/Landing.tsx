@@ -32,7 +32,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { HeroParticleNetwork } from "@/components/landing/HeroParticleNetwork";
-import { LandingCursor } from "@/components/landing/LandingCursor";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
 // --- Animações Premium ---
@@ -286,7 +285,6 @@ type AssistantChoice = null | "saved" | "declined";
 export default function Landing() {
   const { user, loading } = useAuth();
   const [scrolled, setScrolled] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
   const [assistantChoice, setAssistantChoice] = useState<AssistantChoice>(null);
 
   /** Posição do mouse para a rede de partículas (repulsão) - atualizada globalmente */
@@ -322,12 +320,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div
-      className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20 cursor-none"
-      onMouseEnter={() => setCursorVisible(true)}
-      onMouseLeave={() => setCursorVisible(false)}
-    >
-      <LandingCursor visible={cursorVisible} />
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20">
 
       {/* --- Hero background: grid + rede de partículas + orb --- */}
       <div
