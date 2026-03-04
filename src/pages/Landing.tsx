@@ -445,7 +445,7 @@ export default function Landing() {
             </motion.h1>
 
             <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-base sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">Arraste blocos, conecte dados</strong> e crie uma plataforma gerencial desenhada para o seu fluxo com IA nativa. <strong className="font-semibold text-foreground">Modelo customizado</strong> para o que sua clínica precisa.
+              Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">A melhor plataforma em software para clínicas de estética</strong>, conecte dados e crie uma plataforma gerencial desenhada para o seu fluxo. <strong className="font-semibold text-foreground">Gestão de clínicas com IA</strong> para o que o seu negócio precisa.
             </motion.p>
 
             <motion.div {...fadeUp} transition={{ delay: 0.3, duration: 0.8 }} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -496,10 +496,10 @@ export default function Landing() {
                     <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(59,130,246,0.6)]" /> Agenda Dinâmica
                   </span>
                   <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Inteligentes
+                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Eletrônicos
                   </span>
                   <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Integração com IA Personalizada
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Agenda Inteligente para Estética
                   </span>
                 </div>
               ))}
