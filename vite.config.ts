@@ -43,15 +43,11 @@ export default defineConfig({
     minify: "esbuild",
     rollupOptions: {
       output: {
+        // Sem manualChunks: evita createContext/forwardRef undefined (React em chunk separado quebra libs)
+        // Apenas pdf e quill em chunks próprios (já são lazy-loaded)
         manualChunks: (id) => {
-          // React + lucide-react juntos para evitar forwardRef undefined (lucide usa React.forwardRef)
-          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "react";
-          if (id.includes("node_modules/lucide-react")) return "react";
-          if (id.includes("node_modules/framer-motion")) return "framer";
-          if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/jszip") || id.includes("node_modules/canvg")) return "pdf";
           if (id.includes("node_modules/react-quill") || id.includes("node_modules/quill")) return "quill";
-          if (id.includes("node_modules")) return "vendor";
         },
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
