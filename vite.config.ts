@@ -8,16 +8,29 @@ const reactDomDir = path.join(projectRoot, "node_modules/react-dom");
 const reactJsxRuntime = path.join(reactDir, "jsx-runtime.js");
 const reactJsxDevRuntime = path.join(reactDir, "jsx-dev-runtime.js");
 
+/** No build: resolve jsx-runtime antes de qualquer outro plugin (evita react/index.js/jsx-runtime na Vercel). */
+function fixReactJsxResolution() {
+  return {
+    name: "fix-react-jsx-resolution",
+    enforce: "pre" as const,
+    resolveId(id: string) {
+      if (id === "react/jsx-runtime") return reactJsxRuntime;
+      if (id === "react/jsx-dev-runtime") return reactJsxDevRuntime;
+      return null;
+    },
+  };
+}
+
 /** Só em dev: força react/react-dom (corrige forwardRef no lucide-react). */
 function forceReactResolution() {
   return {
     name: "force-react-resolution",
-    enforce: "pre",
+    enforce: "pre" as const,
     resolveId(id: string) {
       if (id === "react") return path.join(reactDir, "index.js");
       if (id === "react-dom") return path.join(reactDomDir, "index.js");
-      if (id === "react/jsx-runtime") return path.join(reactDir, "jsx-runtime.js");
-      if (id === "react/jsx-dev-runtime") return path.join(reactDir, "jsx-dev-runtime.js");
+      if (id === "react/jsx-runtime") return reactJsxRuntime;
+      if (id === "react/jsx-dev-runtime") return reactJsxDevRuntime;
       return null;
     },
   };
@@ -32,7 +45,10 @@ export default defineConfig(({ command }) => ({
       overlay: false,
     },
   },
-  plugins: command === "build" ? [react()] : [forceReactResolution(), react()],
+  plugins:
+    command === "build"
+      ? [fixReactJsxResolution(), react()]
+      : [forceReactResolution(), react()],
   resolve: {
     alias: [
       { find: /^react\/jsx-runtime$/, replacement: reactJsxRuntime },
