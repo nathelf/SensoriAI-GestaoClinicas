@@ -54,9 +54,12 @@ export default defineConfig(({ command }) => ({
       { find: /^react\/jsx-runtime$/, replacement: reactJsxRuntime },
       { find: /^react\/jsx-dev-runtime$/, replacement: reactJsxDevRuntime },
       { find: "@", replacement: path.resolve(__dirname, "./src") },
-      // Só em dev: alias react/react-dom para corrigir forwardRef no lucide-react
+      // React: em dev aponta para index.js (forwardRef/lucide); em build para a pasta (evita index.js/jsx-runtime e garante createContext)
       ...(command === "build"
-        ? []
+        ? [
+            { find: /^react$/, replacement: reactDir },
+            { find: /^react-dom$/, replacement: reactDomDir },
+          ]
         : [
             { find: /^react$/, replacement: path.join(reactDir, "index.js") },
             { find: /^react-dom$/, replacement: path.join(reactDomDir, "index.js") },
@@ -75,9 +78,13 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) return "react";
-          // lucide-react no mesmo chunk que React para evitar "forwardRef undefined" em produção
-          if (id.includes("node_modules/lucide-react")) return "react";
+          // React + react-dom + lucide no mesmo chunk e primeiro na cadeia (evita createContext/forwardRef undefined)
+          if (
+            id.includes("node_modules/react") ||
+            id.includes("node_modules/react-dom") ||
+            id.includes("node_modules/lucide-react")
+          )
+            return "react";
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules")) return "vendor";
