@@ -78,13 +78,13 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React + react-dom + lucide no mesmo chunk e primeiro na cadeia (evita createContext/forwardRef undefined)
+          // React/react-dom/lucide sem nome → ficam no chunk do entry (evita createContext/forwardRef undefined)
           if (
             id.includes("node_modules/react") ||
             id.includes("node_modules/react-dom") ||
             id.includes("node_modules/lucide-react")
           )
-            return "react";
+            return undefined;
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules")) return "vendor";
