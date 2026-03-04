@@ -133,7 +133,7 @@ function RelatoriosDemo() {
   const showLine = (isDragging && dragPos) || connected;
   const canDraw = showLine && lineStart && lineEnd;
 
-  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[13rem] lg:max-w-[13rem] xl:w-[15rem] xl:max-w-[15rem] xl:p-5 2xl:w-[17rem] 2xl:max-w-[17rem] 2xl:p-6";
+  const cardCls = "w-full max-w-[16rem] sm:max-w-[18rem] min-w-0 bg-white dark:bg-card rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border p-4 z-10 lg:w-[14rem] lg:max-w-[14rem]";
 
   return (
     <div
@@ -207,8 +207,8 @@ function RelatoriosDemo() {
           )}
         </div>
       </div>
-      {/* Desktop: blocos lado a lado, bem visíveis e escaláveis */}
-      <div className="hidden lg:flex lg:items-center lg:justify-center lg:gap-8 xl:gap-12 2xl:gap-16 lg:px-4 xl:px-6 relative w-full h-full">
+      {/* Desktop: posição absoluta — bloco 1 top-left, bloco 2 bottom-right (ambos sempre visíveis) */}
+      <div className="hidden lg:block relative w-full h-full min-h-[400px]">
         {canDraw && (
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: "visible" }}>
             <path
@@ -221,10 +221,11 @@ function RelatoriosDemo() {
             />
           </svg>
         )}
-        <div className={cn("relative shrink-0", cardCls)}>
-          <div className="flex items-center gap-3 mb-4 xl:mb-5">
-            <Stethoscope className="w-5 h-5 xl:w-6 xl:h-6 text-purple-600 shrink-0" />
-            <span className="font-semibold text-foreground text-sm sm:text-base xl:text-lg">Histórico do Paciente</span>
+        {/* Bloco 1: Histórico do Paciente — canto superior esquerdo */}
+        <div className={cn("absolute top-6 left-6 xl:top-8 xl:left-8", cardCls)}>
+          <div className="flex items-center gap-3 mb-4">
+            <Stethoscope className="w-5 h-5 text-purple-600 shrink-0" />
+            <span className="font-semibold text-foreground text-sm sm:text-base">Histórico do Paciente</span>
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-muted/60 rounded-full" />
@@ -236,30 +237,19 @@ function RelatoriosDemo() {
             tabIndex={0}
             onMouseDown={(e) => { e.preventDefault(); startDrag(); }}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); startDrag(); } }}
-            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
+            className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm cursor-grab active:cursor-grabbing hover:scale-110 transition-transform pointer-events-auto"
             aria-label="Arraste até o bloco Resumo com IA para conectar"
           />
         </div>
-        <div className="flex flex-col items-center justify-center gap-2 shrink-0 py-4 xl:py-6">
-          <div className="w-1 h-8 xl:h-10 bg-primary/30 rounded-full" aria-hidden />
-          {!connected ? (
-            <span className="text-xs xl:text-sm text-muted-foreground">ou arraste a linha</span>
-          ) : (
-            <div className="flex items-center gap-1.5 xl:gap-2 text-primary">
-              <div className="w-2 h-2 xl:w-2.5 xl:h-2.5 rounded-full bg-primary" />
-              <span className="text-xs xl:text-sm font-medium">Conectado</span>
-            </div>
-          )}
-          <div className="w-1 h-8 xl:h-10 bg-primary/30 rounded-full" aria-hidden />
-        </div>
-        <div className={cn("relative shrink-0", cardCls)}>
+        {/* Bloco 2: SensoriAI — canto inferior direito */}
+        <div className={cn("absolute bottom-20 right-6 xl:bottom-24 xl:right-8", cardCls)}>
           <div
             ref={targetDotRef}
-            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
+            className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white shadow-sm pointer-events-none"
             aria-hidden
           />
-          <div className="flex items-center gap-3 mb-4 xl:mb-5">
-            <SensoriAILogo variant="icon" iconClassName="w-5 h-5 xl:w-6 xl:h-6" noTextFallback />
+          <div className="flex items-center gap-3 mb-4">
+            <SensoriAILogo variant="icon" iconClassName="w-5 h-5" noTextFallback />
           </div>
           <div className="space-y-2.5">
             <div className="h-2 w-full bg-purple-100 dark:bg-purple-900/30 rounded-full" />
