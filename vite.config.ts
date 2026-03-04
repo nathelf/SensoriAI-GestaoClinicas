@@ -20,6 +20,15 @@ function deferMainCss() {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+    dedupe: ["react", "react-dom"],
+  },
+  optimizeDeps: {
+    include: ["react", "react-dom"],
+  },
   server: {
     host: "::",
     port: 8080,
@@ -28,11 +37,6 @@ export default defineConfig({
     },
   },
   plugins: [react(), deferMainCss()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
   build: {
     target: "es2020",
     sourcemap: true,
@@ -40,6 +44,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
+          // React primeiro para evitar "Class extends value undefined" em libs que estendem Component
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "react";
           if (id.includes("node_modules/framer-motion")) return "framer";
           if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) return "radix";
           if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/jszip") || id.includes("node_modules/canvg")) return "pdf";
