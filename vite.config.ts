@@ -15,11 +15,18 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Garante que lucide-react e outros pacotes usem a mesma instância de React (evita forwardRef undefined)
+      react: path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
     include: ["react", "react-dom", "lucide-react"],
+    esbuildOptions: {
+      // Garante que o pré-bundle use a mesma referência de React
+      mainFields: ["module", "main"],
+    },
   },
   build: {
     target: "es2020",
