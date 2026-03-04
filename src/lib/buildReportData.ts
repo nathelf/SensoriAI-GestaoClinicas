@@ -96,8 +96,7 @@ export function buildReportData(
             observacoesClinicas: (p.observacoes_clinicas as string) ?? undefined,
             enderecoCompleto:
               (p.endereco_completo as string) ??
-              [p.address, p.city, p.state, p.zip_code].filter(Boolean).join(', ') ||
-              undefined,
+              ([p.address, p.city, p.state, p.zip_code].filter(Boolean).join(', ') || undefined),
             responsavelNome: (p.responsavel_nome as string) ?? undefined,
             responsavelCpf: (p.responsavel_cpf as string) ?? undefined,
             historicoClinico: options?.patientHistorico,
