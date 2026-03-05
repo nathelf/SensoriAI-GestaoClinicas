@@ -23,9 +23,11 @@ const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const NovoAtendimento = lazy(() => import("./pages/NovoAtendimento"));
 const HistoricoProcedimentos = lazy(() => import("./pages/HistoricoProcedimentos"));
 const GaleriaEvolucao = lazy(() => import("./pages/GaleriaEvolucao"));
-const Agenda = lazy(() => import("./pages/Agenda"));
-const AgendaBloqueios = lazy(() => import("./pages/AgendaBloqueios"));
-const AgendaLinks = lazy(() => import("./pages/AgendaLinks"));
+const CalendarioGeral = lazy(() => import("./pages/agenda/CalendarioGeral"));
+const Disponibilidade = lazy(() => import("./pages/agenda/Disponibilidade"));
+const AgendaBloqueios = lazy(() => import("./pages/agenda/BloqueiosHorario"));
+const TiposAtendimento = lazy(() => import("./pages/agenda/TiposAtendimento"));
+const AgendaLinks = lazy(() => import("./pages/agenda/LinksAgendamento"));
 const Pacientes = lazy(() => import("./pages/Pacientes"));
 const CliniDocs = lazy(() => import("./pages/CliniDocs"));
 const DocumentoAssinatura = lazy(() => import("./pages/DocumentoAssinatura"));
@@ -110,8 +112,11 @@ const App = () => (
                 <Route path="/novo-atendimento" element={<NovoAtendimento />} />
                 <Route path="/historico" element={<HistoricoProcedimentos />} />
                 <Route path="/galeria" element={<GaleriaEvolucao />} />
-                <Route path="/agenda" element={<Agenda />} />
+                <Route path="/agenda" element={<CalendarioGeral />} />
+                <Route path="/agenda/calendario" element={<CalendarioGeral />} />
+                <Route path="/agenda/disponibilidade" element={<Disponibilidade />} />
                 <Route path="/agenda/bloqueios" element={<AgendaBloqueios />} />
+                <Route path="/agenda/tipos-atendimento" element={<TiposAtendimento />} />
                 <Route path="/agenda/links" element={<AgendaLinks />} />
                 <Route path="/pacientes" element={<Pacientes />} />
                 <Route path="/clinidocs" element={<CliniDocs />} />

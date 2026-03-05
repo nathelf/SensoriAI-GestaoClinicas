@@ -45,8 +45,10 @@ const navSections: NavSection[] = [
     icon: Calendar,
     basePath: "/agenda",
     items: [
-      { label: "Calendário Geral", path: "/agenda" },
-      { label: "Bloqueios de Horário", path: "/agenda/bloqueios" },
+      { label: "Calendário Geral", path: "/agenda/calendario" },
+      { label: "Disponibilidade", path: "/agenda/disponibilidade" },
+      { label: "Bloqueios", path: "/agenda/bloqueios" },
+      { label: "Tipos de Atendimento", path: "/agenda/tipos-atendimento" },
       { label: "Links de Agendamento", path: "/agenda/links" },
     ],
     requiredModule: "agenda"
