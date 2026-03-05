@@ -243,7 +243,7 @@ function RelatoriosDemo() {
           />
         </div>
         {/* Área entre blocos — indica fluxo */}
-        <div className="flex flex-col items-center gap-1 shrink-0 z-10">
+        <div className="flex flex-col items-center gap-1 shrink-0 z-10 relative bg-[#F8F9FB]/80 dark:bg-muted/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-border/50">
           {connected ? (
             <>
               <div className="flex items-center gap-2 text-primary font-medium">
@@ -320,7 +320,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20">
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans selection:bg-primary/20 overflow-x-hidden">
 
       {/* --- Hero background: grid + rede de partículas + orb --- */}
       <div
@@ -388,7 +388,7 @@ export default function Landing() {
       <main className="relative z-10 flex-1 pt-24">
         {/* --- Hero Section --- */}
         <section
-          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-0 sm:pt-4 lg:pt-6 px-6 sm:px-6 lg:px-8 overflow-x-hidden overflow-y-visible"
+          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-8 sm:pt-12 lg:pt-16 px-6 sm:px-6 lg:px-8"
           onMouseMove={handleMouseMove}
         >
 
@@ -433,11 +433,11 @@ export default function Landing() {
             </motion.div>
 
             {/* Título principal */}
-            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground leading-[1.05]">
+            <motion.h1 variants={staggerContainer} initial="initial" animate="animate" className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-foreground leading-[1.2] py-4">
               <motion.span variants={fadeUp} className="block">Sua clínica.</motion.span>
               <motion.span
                 variants={fadeUp}
-                className="block mt-2 text-transparent bg-clip-text bg-[linear-gradient(90deg,#6b21a8_0%,#7e22ce_35%,#a855f7_65%,#a855f7_100%)] bg-[length:200%_auto] animate-gradient drop-shadow-[0_0_20px_rgba(168,85,247,0.25)] dark:drop-shadow-[0_0_28px_rgba(168,85,247,0.4)]"
+                className="block mt-2 pb-4 pt-1 text-transparent bg-clip-text bg-[linear-gradient(90deg,#6b21a8_0%,#7e22ce_35%,#a855f7_65%,#a855f7_100%)] bg-[length:200%_auto] animate-gradient drop-shadow-[0_0_20px_rgba(168,85,247,0.25)] dark:drop-shadow-[0_0_28px_rgba(168,85,247,0.4)]"
               >
                 Suas regras.
               </motion.span>
@@ -479,32 +479,6 @@ export default function Landing() {
             </motion.div>
           </div>
 
-          {/* Letreiro contínuo neon: faixa em movimento infinito */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="absolute bottom-0 left-0 right-0 w-full overflow-hidden border-y border-primary/30 bg-foreground/5 backdrop-blur-md flex items-center justify-center min-h-[3.25rem] shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2),inset_0_1px_0_hsl(var(--primary)/0.1)] translate-y-[7vh]"
-          >
-            <div className="flex w-[400%] landing-marquee will-change-transform items-center h-full">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="shrink-0 w-1/4 flex items-center justify-evenly h-full">
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(34,197,94,0.6)]" /> Relatórios Automatizados
-                  </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(59,130,246,0.6)]" /> Agenda Dinâmica
-                  </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(99,102,241,0.6)]" /> Prontuários Eletrônicos
-                  </span>
-                  <span className="neon-sign-text shrink-0 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 leading-none whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 self-center shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]" /> Agenda Inteligente para Estética
-                  </span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </section>
 
         {/* --- Destaque: Relatórios Drag & Drop --- */}
