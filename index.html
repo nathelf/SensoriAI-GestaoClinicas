@@ -1,71 +1,100 @@
-<!doctype html>
-<html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#9b87f5" />
+
+  <!-- SEO principal -->
+  <title>SensoriAI | Software de Gestão para Clínicas com Agenda, Prontuário e Financeiro</title>
+
+  <meta name="description"
+    content="SensoriAI é um software inteligente para gestão de clínicas com agenda online, prontuário eletrônico, controle financeiro e automação com inteligência artificial. Ideal para clínicas médicas, odontológicas e terapêuticas." />
+
+  <meta name="keywords"
+    content="sistema para clínicas, software para clínicas, gestão clínica, prontuário eletrônico, agenda clínica, sistema médico, software saúde, gestão consultório" />
+
+  <meta name="author" content="SensoriAI" />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://www.sensoriai.com.br/" />
+
+  <!-- Performance fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Fonte crítica: carregamento não bloqueante para melhor FCP -->
+
   <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     media="print" onload="this.media='all'" />
+
   <noscript>
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
   </noscript>
-  <!-- Logo: preload removido (carregado sob demanda no sidebar); favicon abaixo usa o mesmo asset -->
 
-  <!-- Favicon configurations for Google Search -->
+  <!-- Favicons -->
   <link rel="icon" href="/favicon.ico" sizes="any" />
-  <link rel="apple-touch-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <!-- Primare SEO Tags -->
-  <title>SensoriAI - Sistema para Clínicas de Estética com Agenda, Prontuário e IA</title>
-  <meta name="description"
-    content="Otimize sua clínica com a SensoriAI. Gestão completa de agenda, prontuário eletrônico, financeiro e inteligência artificial para clínicas. Teste agora!" />
-  <meta name="author" content="SensoriAI" />
-
-  <!-- Open Graph (Facebook, WhatsApp, LinkedIn, etc.) -->
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.sensoriai.com.br/" />
-  <meta property="og:title" content="SensoriAI | Gestão Inteligente para Clínicas" />
+  <meta property="og:site_name" content="SensoriAI" />
+
+  <meta property="og:title"
+    content="SensoriAI | Sistema Inteligente para Gestão de Clínicas" />
+
   <meta property="og:description"
-    content="Otimize sua clínica com a SensoriAI. Gestão completa de agenda, prontuário eletrônico, financeiro e inteligência artificial para clínicas. Teste agora!" />
+    content="Software completo para gestão de clínicas com agenda online, prontuário eletrônico, controle financeiro e inteligência artificial." />
+
   <meta property="og:image" content="https://www.sensoriai.com.br/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="pt_BR" />
-  <meta property="og:site_name" content="SensoriAI" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://www.sensoriai.com.br/" />
-  <meta name="twitter:title" content="SensoriAI | Gestão Inteligente para Clínicas" />
+  <meta name="twitter:title"
+    content="SensoriAI | Sistema Inteligente para Gestão de Clínicas" />
   <meta name="twitter:description"
-    content="Otimize sua clínica com a SensoriAI. Gestão completa de agenda, prontuário eletrônico, financeiro e inteligência artificial para clínicas. Teste agora!" />
+    content="Gestão completa para clínicas com agenda, prontuário eletrônico, financeiro e inteligência artificial." />
   <meta name="twitter:image" content="https://www.sensoriai.com.br/og-image.png" />
   <meta name="twitter:image:alt" content="SensoriAI - Gestão inteligente para clínicas" />
 
-  <!-- Schema Markup (JSON-LD) para SEO -->
+  <!-- Schema Organization -->
   <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "url": "https://sensoriai.com.br",
-      "logo": "https://sensoriai.com.br/sensoriai-logo.png",
-      "name": "SensoriAI",
-      "description": "Plataforma SaaS inteligente para gestão de clínicas de estética com IA integrada."
-    }
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SensoriAI",
+    "url": "https://www.sensoriai.com.br",
+    "logo": "https://www.sensoriai.com.br/sensoriai-logo.png",
+    "description": "Plataforma SaaS para gestão inteligente de clínicas com agenda, prontuário eletrônico, financeiro e automação com inteligência artificial.",
+    "sameAs": [
+      "https://www.linkedin.com/company/sensoriai",
+      "https://www.instagram.com/sensoriai"
+    ]
+  }
   </script>
+
+  <!-- Schema Software -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SensoriAI",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "url": "https://www.sensoriai.com.br",
+    "description": "Software de gestão para clínicas com agenda, prontuário eletrônico, financeiro e automação com inteligência artificial.",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "BRL"
+    }
+  }
+  </script>
+
 </head>
-
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
-</body>
-
-</html>
