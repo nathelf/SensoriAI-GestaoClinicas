@@ -3,7 +3,7 @@ import { useState } from "react";
 import { User, AlertTriangle, ChevronRight, ClipboardList } from "lucide-react";
 
 const skinTypes = ["Seca", "Oleosa", "Mista", "Normal"];
-const procedures = ["Botox", "Preenchimento", "Fios", "Bioestimuladores", "Outros"];
+const procedures = ["Consulta", "Procedimento", "Avaliação", "Retorno", "Outros"];
 
 export default function NovoAtendimento() {
   const [skinType, setSkinType] = useState("Mista");
@@ -113,7 +113,7 @@ export default function NovoAtendimento() {
             <div className="stat-card space-y-4">
               <div className="flex items-center gap-2 mb-1">
                 <ClipboardList className="w-4 h-4 text-primary" />
-                <h3 className="font-semibold text-sm text-foreground">Avaliação Estética</h3>
+                <h3 className="font-semibold text-sm text-foreground">Avaliação Clínica</h3>
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">Tipo de Pele</label>

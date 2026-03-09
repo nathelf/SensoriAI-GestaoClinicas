@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { AlertTriangle, CalendarClock, Phone } from "lucide-react";
 
 const alerts = [
-  { name: "Mariana Costa", proc: "Botox - Testa", days: 15, date: "18/03/2026", phone: "(11) 97777-9012", urgent: true },
-  { name: "Juliana Alves", proc: "Preenchimento Labial", days: 30, date: "01/04/2026", phone: "(11) 96666-3456", urgent: false },
-  { name: "Renata Lima", proc: "Bioestimulador", days: 7, date: "10/03/2026", phone: "(11) 95555-7890", urgent: true },
-  { name: "Fernanda Souza", proc: "Fios PDO", days: 60, date: "02/05/2026", phone: "(11) 94444-1234", urgent: false },
+  { name: "Mariana Costa", proc: "Procedimento", days: 15, date: "18/03/2026", phone: "(11) 97777-9012", urgent: true },
+  { name: "Juliana Alves", proc: "Retorno", days: 30, date: "01/04/2026", phone: "(11) 96666-3456", urgent: false },
+  { name: "Renata Lima", proc: "Procedimento", days: 7, date: "10/03/2026", phone: "(11) 95555-7890", urgent: true },
+  { name: "Fernanda Souza", proc: "Retorno", days: 60, date: "02/05/2026", phone: "(11) 94444-1234", urgent: false },
 ];
 
 export default function AlertasRetorno() {

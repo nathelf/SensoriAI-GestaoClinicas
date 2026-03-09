@@ -127,7 +127,7 @@ export default function DadosClinica() {
               value={formData.nome}
               onChange={handleChange}
               type="text"
-              placeholder="SensoriAI Estética"
+              placeholder="Nome da Unidade"
               className="w-full px-4 py-2.5 rounded-xl border border-border/40 bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 
 const timeline = [
-  { date: "02/03/2026", proc: "Botox - Testa e Glabela", prof: "Dra. Nathalia", notes: "30U aplicadas. Paciente tolerou bem.", product: "Toxina Botulínica 100U" },
-  { date: "15/02/2026", proc: "Preenchimento Labial", prof: "Dra. Nathalia", notes: "1ml ácido hialurônico. Resultado natural.", product: "Ácido Hialurônico 1ml" },
+  { date: "02/03/2026", proc: "Consulta", prof: "Dra. Nathalia", notes: "Avaliação inicial. Paciente orientado.", product: "-" },
+  { date: "15/02/2026", proc: "Procedimento", prof: "Dra. Nathalia", notes: "Realizado conforme protocolo. Evolução favorável.", product: "-" },
   { date: "20/01/2026", proc: "Avaliação Inicial", prof: "Dra. Nathalia", notes: "Anamnese completa. Plano de tratamento definido.", product: "-" },
 ];
 

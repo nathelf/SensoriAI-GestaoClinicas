@@ -445,7 +445,7 @@ export default function Landing() {
             </motion.h1>
 
             <motion.p {...fadeUp} transition={{ delay: 0.2, duration: 0.8 }} className="mt-8 text-base sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">A melhor plataforma em software para clínicas de estética</strong>, conecte dados e crie uma plataforma gerencial desenhada para o seu fluxo. <strong className="font-semibold text-foreground">Gestão de clínicas com IA</strong> para o que o seu negócio precisa.
+              Liberte-se de softwares engessados. <strong className="font-semibold text-foreground">A melhor plataforma em software para clínicas</strong>, conecte dados e crie uma plataforma gerencial desenhada para o seu fluxo. <strong className="font-semibold text-foreground">Gestão de clínicas com IA</strong> para o que o seu negócio precisa.
             </motion.p>
 
             <motion.div {...fadeUp} transition={{ delay: 0.3, duration: 0.8 }} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">

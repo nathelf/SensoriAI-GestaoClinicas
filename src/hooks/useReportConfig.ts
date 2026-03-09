@@ -12,7 +12,7 @@ export interface ReportConfig {
 const defaultConfig: ReportConfig = {
   logoDataUrl: '',
   titulo: 'Relatório de Performance',
-  rodape: 'SensoriAI - Inteligência em Gestão Estética',
+  rodape: 'SensoriAI - Inteligência em Gestão de Clínicas',
   layout: 'lista',
   dadosUnidade: '',
 };

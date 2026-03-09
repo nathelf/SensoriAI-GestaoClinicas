@@ -68,7 +68,7 @@ export default function TabelaAtendimento() {
         )}
       </motion.div>
       <CrudModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Editar Regra" : "Nova Regra"} onSubmit={handleSubmit} loading={saving}>
-        <FormField label="Nome *"><FormInput value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Toxina Botulínica" required /></FormField>
+        <FormField label="Nome *"><FormInput value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Procedimento Principal" required /></FormField>
         <FormField label="Percentual (%) *"><FormInput type="number" step="0.1" value={ratePercent} onChange={e => setRatePercent(e.target.value)} required /></FormField>
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} className="rounded border-border" />

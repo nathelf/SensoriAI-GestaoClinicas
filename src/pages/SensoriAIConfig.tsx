@@ -33,7 +33,7 @@ export default function SensoriAIConfig() {
             </div>
             <textarea
               rows={6}
-              defaultValue="Você é um assistente de vendas gentil e profissional para uma clínica de estética. Seu objetivo é converter consultas em agendamentos. Use tom empático e destaque benefícios dos procedimentos."
+              defaultValue="Você é um assistente de vendas gentil e profissional para uma clínica. Seu objetivo é converter consultas em agendamentos. Use tom empático e destaque benefícios dos procedimentos e serviços."
               className="w-full px-3 py-2.5 bg-card border border-border/60 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             />
           </div>
