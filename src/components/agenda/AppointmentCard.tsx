@@ -9,6 +9,7 @@ import {
   CalendarClock,
   UserCheck,
   Play,
+  MoreHorizontal,
 } from "lucide-react";
 import {
   Tooltip,
@@ -30,7 +31,7 @@ export interface Appointment {
   id: string;
   patient: string;
   type: string;
-  duration: string;
+  duration: string; // ex: "30 min"
   status: AppointmentStatus;
   day: number;
   startSlot: number;
@@ -40,36 +41,45 @@ export interface Appointment {
 
 export const STATUS_CONFIG: Record<
   AppointmentStatus,
-  { label: string; className: string; dotClass: string }
+  {
+    label: string;
+    className: string;
+    dotClass: string;
+    accentClass: string; // barra lateral
+  }
 > = {
   agendado: {
     label: "Agendado",
     className:
       "bg-status-scheduled/10 border-status-scheduled/30 text-status-scheduled",
     dotClass: "bg-status-scheduled",
+    accentClass: "bg-status-scheduled",
   },
   confirmado: {
     label: "Confirmado",
     className:
       "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed",
     dotClass: "bg-status-confirmed",
+    accentClass: "bg-status-confirmed",
   },
   faltou: {
     label: "Faltou",
-    className:
-      "bg-status-noshow/10 border-status-noshow/30 text-status-noshow",
+    className: "bg-status-noshow/10 border-status-noshow/30 text-status-noshow",
     dotClass: "bg-status-noshow",
+    accentClass: "bg-status-noshow",
   },
   cancelado: {
     label: "Cancelado",
     className: "bg-muted border-border text-muted-foreground",
     dotClass: "bg-status-cancelled",
+    accentClass: "bg-status-cancelled",
   },
   concluido: {
     label: "Concluído",
     className:
       "bg-status-confirmed/10 border-status-confirmed/30 text-status-confirmed",
     dotClass: "bg-status-confirmed",
+    accentClass: "bg-status-confirmed",
   },
 };
 
@@ -80,9 +90,9 @@ export const HOURS = Array.from({ length: 25 }, (_, i) => {
 }).slice(0, 25);
 
 const MODALITY_ICONS: Record<AppointmentModality, React.ReactNode> = {
-  teleconsulta: <Video className="h-3 w-3" />,
-  presencial: <MapPin className="h-3 w-3" />,
-  procedimento: <Stethoscope className="h-3 w-3" />,
+  teleconsulta: <Video className="h-3.5 w-3.5" />,
+  presencial: <MapPin className="h-3.5 w-3.5" />,
+  procedimento: <Stethoscope className="h-3.5 w-3.5" />,
 };
 
 function getInitials(name: string) {
@@ -111,11 +121,12 @@ const QuickAction = ({ icon, label, onClick, destructive }: QuickActionProps) =>
           onClick(e);
         }}
         className={[
-          "w-6 h-6 rounded-md flex items-center justify-center transition-colors",
-          "text-muted-foreground bg-card/80 shadow-sm border border-border/50",
+          "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
+          "bg-background/80 backdrop-blur border border-border/60 shadow-sm",
           destructive
             ? "hover:bg-destructive/10 hover:text-destructive"
-            : "hover:bg-primary-light hover:text-primary",
+            : "hover:bg-primary/10 hover:text-primary",
+          "text-muted-foreground",
         ].join(" ")}
         aria-label={label}
         title={label}
@@ -142,9 +153,7 @@ const AppointmentCard = ({
   onClick,
   onStatusChange,
 }: AppointmentCardProps) => {
-  // ✅ airbag: nunca quebra se vier status inesperado
-  const config =
-    STATUS_CONFIG[apt.status] ?? STATUS_CONFIG["agendado"];
+  const config = STATUS_CONFIG[apt.status] ?? STATUS_CONFIG.agendado;
 
   const startTime = HOURS[apt.startSlot] ?? HOURS[0] ?? "--:--";
   const endSlot = apt.startSlot + apt.slots;
@@ -153,85 +162,141 @@ const AppointmentCard = ({
 
   const initials = getInitials(apt.patient);
 
+  // deixa cards curtinhos mais "limpos" (não tenta enfiar tudo em 1 slot)
+  const isCompact = apt.slots <= 1;
+
   return (
-    <TooltipProvider delayDuration={200}>
+    <TooltipProvider delayDuration={150}>
       <button
         type="button"
         onClick={onClick}
         className={[
-          "absolute inset-x-1 rounded-lg border px-2 py-1.5 text-left cursor-pointer",
-          "transition-all hover:shadow-card-hover z-10 group/card",
+          "absolute inset-x-1 text-left cursor-pointer z-10 group/card",
+          "rounded-xl border shadow-sm transition-all",
+          "hover:shadow-md hover:-translate-y-[0.5px]",
+          "focus:outline-none focus:ring-2 focus:ring-primary/30",
           config.className,
         ].join(" ")}
-        style={{ height: `${apt.slots * slotHeight - 4}px`, top: "2px" }}
+        style={{ height: `${apt.slots * slotHeight - 6}px`, top: "3px" }}
       >
-        {/* Quick Actions (aparecem no hover) */}
-        <div className="absolute -top-1 right-1 hidden group-hover/card:flex items-center gap-0.5 z-20">
-          {/* ✅ confirmar só quando estiver agendado */}
+        {/* Accent bar (igual UI premium) */}
+        <div
+          className={[
+            "absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl",
+            config.accentClass,
+          ].join(" ")}
+        />
+
+        {/* Quick actions (hover) - mais discreto e "dentro" do card */}
+        <div className="absolute top-2 right-2 hidden group-hover/card:flex items-center gap-1 z-20">
           {apt.status === "agendado" && (
             <QuickAction
-              icon={<Check className="h-3 w-3" />}
+              icon={<Check className="h-4 w-4" />}
               label="Confirmar"
               onClick={() => onStatusChange?.(apt.id, "confirmado")}
             />
           )}
 
-          {/* ✅ ações disponíveis em agendado/confirmado */}
           {(apt.status === "agendado" || apt.status === "confirmado") && (
             <>
               <QuickAction
-                icon={<UserCheck className="h-3 w-3" />}
+                icon={<UserCheck className="h-4 w-4" />}
                 label="Check-in"
                 onClick={() => {}}
               />
               <QuickAction
-                icon={<Play className="h-3 w-3" />}
+                icon={<Play className="h-4 w-4" />}
                 label="Iniciar"
                 onClick={() => {}}
               />
               <QuickAction
-                icon={<CalendarClock className="h-3 w-3" />}
+                icon={<CalendarClock className="h-4 w-4" />}
                 label="Reagendar"
                 onClick={() => {}}
               />
               <QuickAction
-                icon={<X className="h-3 w-3" />}
+                icon={<X className="h-4 w-4" />}
                 label="Cancelar"
                 onClick={() => onStatusChange?.(apt.id, "cancelado")}
                 destructive
               />
             </>
           )}
+
+          {/* fallback: menu (se quiser depois abrir dropdown) */}
+          <QuickAction
+            icon={<MoreHorizontal className="h-4 w-4" />}
+            label="Mais"
+            onClick={() => {}}
+          />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-[10px] font-bold text-primary">
-              {initials}
+        {/* Content */}
+        <div className="relative h-full w-full pl-3 pr-2 py-2">
+          <div className="flex items-start gap-2">
+            {/* Avatar */}
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
+              <span className="text-xs font-semibold text-primary">
+                {initials}
+              </span>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              {/* Linha 1: Nome + modality */}
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold truncate flex-1 leading-tight">
+                  {apt.patient}
+                </p>
+
+                {apt.modality && (
+                  <span className="opacity-70 flex-shrink-0">
+                    {MODALITY_ICONS[apt.modality]}
+                  </span>
+                )}
+              </div>
+
+              {/* Linha 2: Tipo */}
+              {!isCompact && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                  {apt.type}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Rodapé: horário + duração */}
+          <div
+            className={[
+              "mt-2 flex items-center gap-2",
+              isCompact ? "mt-1" : "",
+            ].join(" ")}
+          >
+            <div className="flex items-center gap-1 text-xs text-foreground/80">
+              <Clock className="h-3.5 w-3.5 opacity-70" />
+              <span className="truncate">
+                {startTime} – {endTime}
+              </span>
+            </div>
+
+            <span className="ml-auto text-xs text-foreground/70">
+              {apt.duration}
             </span>
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1">
-              <p className="text-xs font-semibold truncate flex-1">
-                {apt.patient}
-              </p>
-              {apt.modality && (
-                <span className="opacity-60 flex-shrink-0">
-                  {MODALITY_ICONS[apt.modality]}
-                </span>
-              )}
+          {/* Badge de status opcional (deixa mais parecido com print 2) */}
+          {!isCompact && (
+            <div className="mt-1.5 flex items-center gap-2">
+              <span
+                className={[
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px]",
+                  "bg-background/50 border border-border/50 text-foreground/70",
+                ].join(" ")}
+              >
+                <span className={["h-2 w-2 rounded-full", config.dotClass].join(" ")} />
+                {config.label}
+              </span>
             </div>
-            <p className="text-[10px] opacity-70 truncate">{apt.type}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1 mt-1">
-          <Clock className="h-3 w-3 opacity-60" />
-          <span className="text-[10px] opacity-80">
-            {startTime} – {endTime}
-          </span>
-          <span className="text-[10px] opacity-60 ml-auto">{apt.duration}</span>
+          )}
         </div>
       </button>
     </TooltipProvider>
