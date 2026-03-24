@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { Image } from "lucide-react";
 
 const gallery = [
-  { patient: "Clara Ribeiro", proc: "Preenchimento Labial", date: "02/03/2026" },
-  { patient: "Ana Santos", proc: "Botox Testa", date: "28/02/2026" },
-  { patient: "Mariana Costa", proc: "Bioestimulador Malar", date: "15/02/2026" },
+  { patient: "Clara Ribeiro", proc: "Procedimento", date: "02/03/2026" },
+  { patient: "Ana Santos", proc: "Avaliação", date: "28/02/2026" },
+  { patient: "Mariana Costa", proc: "Retorno", date: "15/02/2026" },
 ];
 
 export default function GaleriaEvolucao() {

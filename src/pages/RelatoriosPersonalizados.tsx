@@ -369,7 +369,7 @@ function RelatoriosPersonalizadosContent() {
                     <div className="flex justify-between items-center w-full animate-in fade-in duration-300">
                         <div>
                             <h2 className="text-3xl font-extrabold text-foreground leading-tight">SensoriAI</h2>
-                            <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Inteligência em Gestão Estética</p>
+                            <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Inteligência em Gestão de Clínicas</p>
                         </div>
                         <div className="text-right">
                             <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-tighter">Emissão do Relatório</p>

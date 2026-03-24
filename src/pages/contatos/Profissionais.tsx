@@ -85,7 +85,7 @@ export default function Profissionais() {
       </motion.div>
       <CrudModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Editar Profissional" : "Novo Profissional"} onSubmit={handleSubmit} loading={saving}>
         <FormField label="Nome *"><FormInput value={form.name} onChange={e => set("name", e.target.value)} required /></FormField>
-        <FormField label="Especialidade"><FormInput value={form.specialty} onChange={e => set("specialty", e.target.value)} placeholder="Ex: Harmonização Facial" /></FormField>
+        <FormField label="Especialidade"><FormInput value={form.specialty} onChange={e => set("specialty", e.target.value)} placeholder="Ex: Especialidade" /></FormField>
         <FormField label="CRM / CRBM"><FormInput value={form.document} onChange={e => set("document", e.target.value)} placeholder="Ex: CRM 12345" /></FormField>
         <FormField label="E-mail"><FormInput type="email" value={form.email} onChange={e => set("email", e.target.value)} /></FormField>
         <FormField label="Telefone"><FormInput value={form.phone} onChange={e => set("phone", e.target.value)} /></FormField>

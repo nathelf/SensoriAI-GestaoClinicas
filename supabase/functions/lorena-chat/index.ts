@@ -33,7 +33,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const messages: Msg[] = Array.isArray(body?.messages) ? body.messages : [];
 
-    const system = `Você é a Lorena, assistente virtual inteligente da SensoriAI — uma plataforma SaaS para clínicas de estética.
+    const system = `Você é a Lorena, assistente virtual inteligente da SensoriAI — uma plataforma SaaS para gestão de clínicas.
 
 Personalidade:
 - Simpática, profissional e empática

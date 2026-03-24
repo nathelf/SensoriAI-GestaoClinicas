@@ -1,6 +1,6 @@
-# SensoriAI - Gestão para Clínicas de Estética
+# SensoriAI - Gestão para Clínicas
 
-Plataforma SaaS para gestão de clínicas de estética: agenda, prontuário, financeiro e IA integrada.
+Plataforma SaaS para gestão de clínicas: agenda, prontuário eletrônico, financeiro e IA integrada. Aplicável a qualquer segmento (médico, odontológico, terapêutico, entre outros).
 
 ## Tecnologias
 

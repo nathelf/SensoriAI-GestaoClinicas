@@ -79,7 +79,7 @@ export const CLINIC_TEMPLATES: ClinicTemplate[] = [
   <h1 style="text-align: center; color: #9b87f5;">Contrato de Prestação de Serviços</h1>
   <p>Entre a <strong>CLÍNICA</strong> e o(a) <strong>PACIENTE/CONTRATANTE</strong> {{nome_paciente}}, CPF {{cpf}}, firma-se o presente contrato:</p>
   <h3 style="color: #9b87f5; border-bottom: 2px solid #9b87f5; padding-bottom: 5px;">1. Objeto</h3>
-  <p>Contratação de serviços de saúde estética conforme procedimentos e valores acordados.</p>
+  <p>Contratação de serviços de saúde conforme procedimentos e valores acordados.</p>
   <h3 style="color: #9b87f5; border-bottom: 2px solid #9b87f5; padding-bottom: 5px;">2. Valor e Forma de Pagamento</h3>
   <p>_________________________________________</p>
   <h3 style="color: #9b87f5; border-bottom: 2px solid #9b87f5; padding-bottom: 5px;">3. Obrigações da Clínica</h3>

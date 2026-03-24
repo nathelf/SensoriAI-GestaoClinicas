@@ -109,7 +109,7 @@ export function useFaturamento(dateRange: DateRange, patientId?: string | null) 
                 ? topProcedimentos.map(p => `${p.nome}: ${p.quantidade} agend. (R$ ${p.valor_total.toFixed(2)})`).join('; ')
                 : 'Nenhum procedimento agendado';
 
-            const resumoParaIA = `Faturamento total no período: R$ ${total.toFixed(2)}. Top Procedimentos: ${procedimentosTexto}. Período: ${dateRange.from.toLocaleDateString()} até ${dateRange.to.toLocaleDateString()}. Analise e sugira estratégias para clínica estética.`;
+            const resumoParaIA = `Faturamento total no período: R$ ${total.toFixed(2)}. Top Procedimentos: ${procedimentosTexto}. Período: ${dateRange.from.toLocaleDateString()} até ${dateRange.to.toLocaleDateString()}. Analise e sugira estratégias para o estabelecimento.`;
 
             setDados({
                 total,

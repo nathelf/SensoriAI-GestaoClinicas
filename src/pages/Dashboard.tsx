@@ -49,7 +49,7 @@ const stories = [
 
 const upcomingAppointments = [
   { name: "Clara Ribeiro", procedure: "Anamnese, Avaliação", time: "14:00 - 15:00", color: "bg-pastel-lavender/40" },
-  { name: "Ana Santos", procedure: "Botox - Testa", time: "15:30 - 16:00", color: "bg-pastel-mint/40" },
+  { name: "Ana Santos", procedure: "Consulta", time: "15:30 - 16:00", color: "bg-pastel-mint/40" },
 ];
 
 const fadeUp = {
@@ -493,8 +493,8 @@ export default function Dashboard() {
           </div>
           <div className="space-y-2">
             {[
-              { name: "Mariana Costa", days: "15 dias pós-toxina", urgent: true },
-              { name: "Juliana Alves", days: "30 dias pós-preenchimento", urgent: false },
+              { name: "Mariana Costa", days: "15 dias pós-procedimento", urgent: true },
+              { name: "Juliana Alves", days: "30 dias pós-avaliação", urgent: false },
               { name: "Renata Lima", days: "7 dias - revisão", urgent: true },
             ].map((alert, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40">
