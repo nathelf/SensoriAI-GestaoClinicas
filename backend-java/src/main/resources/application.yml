@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: sensoriai-gestao-clinicas
+
+  # Configuração do banco de dados (PostgreSQL / Supabase)
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/gestao_clinicas}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA / Hibernate — ORM que converte classes Java em tabelas SQL
+  jpa:
+    hibernate:
+      # validate: verifica se as entidades batem com o banco, sem alterar nada
+      # (usamos migrations SQL separadas, como já existe no supabase/migrations/)
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # Segurança
+  security:
+    jwt:
+      secret: ${JWT_SECRET:chave-secreta-trocar-em-producao}
+      expiration-ms: 86400000  # 24 horas em milissegundos
+
+# Porta do servidor (padrão 8080)
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api  # todos os endpoints ficam em /api/...
+
+# Logs
+logging:
+  level:
+    root: INFO
+    com.sensoriai: DEBUG
+    org.springframework.security: INFO
+
+---
+# Perfil de desenvolvimento (ativo com: --spring.profiles.active=dev)
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/gestao_clinicas_dev}
